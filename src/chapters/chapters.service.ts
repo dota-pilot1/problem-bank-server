@@ -20,7 +20,14 @@ export class ChaptersService {
     return chapter;
   }
 
-  async findAll() {
+  async findAll(gradeId?: number) {
+    if (gradeId) {
+      return await this.db
+        .select()
+        .from(schema.chapters)
+        .where(eq(schema.chapters.gradeId, gradeId))
+        .orderBy(schema.chapters.orderIndex);
+    }
     return await this.db.select().from(schema.chapters);
   }
 
@@ -29,6 +36,14 @@ export class ChaptersService {
       .select()
       .from(schema.chapters)
       .where(eq(schema.chapters.subjectId, subjectId))
+      .orderBy(schema.chapters.orderIndex);
+  }
+
+  async findByGrade(gradeId: number) {
+    return await this.db
+      .select()
+      .from(schema.chapters)
+      .where(eq(schema.chapters.gradeId, gradeId))
       .orderBy(schema.chapters.orderIndex);
   }
 

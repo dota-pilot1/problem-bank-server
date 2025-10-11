@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TestSetsService } from './test-sets.service';
 import { CreateTestSetDto } from './dto/create-test-set.dto';
@@ -21,8 +22,8 @@ export class TestSetsController {
   }
 
   @Get()
-  findAll() {
-    return this.testSetsService.findAll();
+  findAll(@Query('gradeId') gradeId?: string) {
+    return this.testSetsService.findAll(gradeId ? +gradeId : undefined);
   }
 
   @Get(':id')

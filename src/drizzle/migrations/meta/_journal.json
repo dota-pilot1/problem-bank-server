@@ -8,6 +8,13 @@
       "when": 1760125470006,
       "tag": "0000_daffy_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1760200172715,
+      "tag": "0001_lucky_iron_fist",
+      "breakpoints": true
     }
   ]
 }

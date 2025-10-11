@@ -21,7 +21,13 @@ export class ChaptersController {
   }
 
   @Get()
-  findAll(@Query('subjectId') subjectId?: string) {
+  findAll(
+    @Query('subjectId') subjectId?: string,
+    @Query('gradeId') gradeId?: string,
+  ) {
+    if (gradeId) {
+      return this.chaptersService.findByGrade(+gradeId);
+    }
     if (subjectId) {
       return this.chaptersService.findBySubject(+subjectId);
     }

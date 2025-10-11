@@ -21,7 +21,13 @@ export class TestSetsService {
     return testSet;
   }
 
-  async findAll() {
+  async findAll(gradeId?: number) {
+    if (gradeId) {
+      return await this.db
+        .select()
+        .from(schema.testSets)
+        .where(eq(schema.testSets.gradeId, gradeId));
+    }
     return await this.db.select().from(schema.testSets);
   }
 

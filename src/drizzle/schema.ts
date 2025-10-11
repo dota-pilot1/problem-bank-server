@@ -24,6 +24,7 @@ export const testTypeEnum = pgEnum('test_type', [
   'FINAL',
   'MOCK',
 ]);
+export const schoolLevelEnum = pgEnum('school_level', ['MIDDLE', 'HIGH']);
 
 // 1. Subjects (과목)
 export const subjects = pgTable('subjects', {
@@ -34,11 +35,27 @@ export const subjects = pgTable('subjects', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// 2. Chapters (단원)
+// 2. Grades (학년)
+export const grades = pgTable('grades', {
+  id: serial('id').primaryKey(),
+  subjectId: integer('subject_id')
+    .references(() => subjects.id)
+    .notNull(),
+  name: varchar('name', { length: 50 }).notNull(),
+  displayOrder: integer('display_order').notNull(),
+  schoolLevel: schoolLevelEnum('school_level').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// 3. Chapters (단원)
 export const chapters = pgTable('chapters', {
   id: serial('id').primaryKey(),
   subjectId: integer('subject_id')
     .references(() => subjects.id)
+    .notNull(),
+  gradeId: integer('grade_id')
+    .references(() => grades.id)
     .notNull(),
   name: varchar('name', { length: 200 }).notNull(),
   orderIndex: integer('order_index').notNull(),
@@ -74,6 +91,7 @@ export const testSets = pgTable('test_sets', {
   title: varchar('title', { length: 200 }).notNull(),
   description: text('description'),
   subjectId: integer('subject_id').references(() => subjects.id),
+  gradeId: integer('grade_id').references(() => grades.id),
   testType: testTypeEnum('test_type'),
   totalQuestions: integer('total_questions').notNull().default(0),
   timeLimit: integer('time_limit'),
@@ -92,6 +110,7 @@ export const testSetProblems = pgTable('test_set_problems', {
     .references(() => problems.id)
     .notNull(),
   orderIndex: integer('order_index').notNull(),
+  score: integer('score').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
