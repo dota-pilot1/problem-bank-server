@@ -12,15 +12,29 @@ async function resetDatabase() {
   console.log('🗑️  Resetting database...');
 
   try {
-    await pool.query(`
-      TRUNCATE TABLE user_attempts CASCADE;
-      TRUNCATE TABLE test_set_problems CASCADE;
-      TRUNCATE TABLE test_sets CASCADE;
-      TRUNCATE TABLE problems CASCADE;
-      TRUNCATE TABLE chapters CASCADE;
-      TRUNCATE TABLE grades CASCADE;
-      TRUNCATE TABLE subjects CASCADE;
-    `);
+    // 각 테이블을 개별적으로 truncate (존재하지 않는 테이블은 무시)
+    const tables = [
+      'user_attempts',
+      'test_set_problems',
+      'test_sets',
+      'problems',
+      'chapters',
+      'grades',
+      'subjects',
+    ];
+
+    for (const table of tables) {
+      try {
+        await pool.query(`TRUNCATE TABLE ${table} CASCADE;`);
+        console.log(`✓ Truncated ${table}`);
+      } catch (err) {
+        if (err.code === '42P01') {
+          console.log(`⚠ Table ${table} does not exist, skipping...`);
+        } else {
+          throw err;
+        }
+      }
+    }
 
     console.log('✅ Database reset completed!');
   } catch (error) {
