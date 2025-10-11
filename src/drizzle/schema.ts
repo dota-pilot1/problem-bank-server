@@ -16,8 +16,16 @@ export const questionTypeEnum = pgEnum('question_type', [
   'TRUE_FALSE',
   'SHORT_ANSWER',
 ]);
+export const testTypeEnum = pgEnum('test_type', [
+  'DAILY',
+  'WEEKLY',
+  'MONTHLY',
+  'MIDTERM',
+  'FINAL',
+  'MOCK',
+]);
 
-// Subjects Table (과목: 수학 개념, 수학 기본, 영어 듣기 등)
+// 1. Subjects (과목)
 export const subjects = pgTable('subjects', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull().unique(),
@@ -26,12 +34,25 @@ export const subjects = pgTable('subjects', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Problems Table
+// 2. Chapters (단원)
+export const chapters = pgTable('chapters', {
+  id: serial('id').primaryKey(),
+  subjectId: integer('subject_id')
+    .references(() => subjects.id)
+    .notNull(),
+  name: varchar('name', { length: 200 }).notNull(),
+  orderIndex: integer('order_index').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// 3. Problems (문제)
 export const problems = pgTable('problems', {
   id: serial('id').primaryKey(),
   subjectId: integer('subject_id')
     .references(() => subjects.id)
     .notNull(),
+  chapterId: integer('chapter_id').references(() => chapters.id),
   questionType: questionTypeEnum('question_type').notNull(),
   difficulty: difficultyEnum('difficulty').notNull(),
   questionText: text('question_text').notNull(),
@@ -47,10 +68,38 @@ export const problems = pgTable('problems', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// User Attempts Table (풀이 응답 + 채점 데이터)
+// 4. Test Sets (시험지)
+export const testSets = pgTable('test_sets', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 200 }).notNull(),
+  description: text('description'),
+  subjectId: integer('subject_id').references(() => subjects.id),
+  testType: testTypeEnum('test_type'),
+  totalQuestions: integer('total_questions').notNull().default(0),
+  timeLimit: integer('time_limit'),
+  isActive: boolean('is_active').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// 5. Test Set Problems (N:M 연결)
+export const testSetProblems = pgTable('test_set_problems', {
+  id: serial('id').primaryKey(),
+  testSetId: integer('test_set_id')
+    .references(() => testSets.id)
+    .notNull(),
+  problemId: integer('problem_id')
+    .references(() => problems.id)
+    .notNull(),
+  orderIndex: integer('order_index').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// 6. User Attempts (풀이 응답 + 채점 데이터)
 export const userAttempts = pgTable('user_attempts', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull(),
+  testSetId: integer('test_set_id').references(() => testSets.id),
   problemId: integer('problem_id')
     .references(() => problems.id)
     .notNull(),

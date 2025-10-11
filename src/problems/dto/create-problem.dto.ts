@@ -1,5 +1,6 @@
 export class CreateProblemDto {
   subjectId: number;
+  chapterId?: number;
   questionType: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   questionText: string;
