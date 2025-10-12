@@ -7,6 +7,8 @@ import { SubjectsModule } from './subjects/subjects.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { TestSetsModule } from './test-sets/test-sets.module';
 import { GradesModule } from './grades/grades.module';
+import { MathModule } from './math/math.module';
+import { EnglishModule } from './english/english.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { GradesModule } from './grades/grades.module';
     GradesModule,
     ChaptersModule,
     TestSetsModule,
+    MathModule,
+    EnglishModule,
   ],
   controllers: [AppController],
   providers: [AppService],

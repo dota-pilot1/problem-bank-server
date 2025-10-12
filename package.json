@@ -23,7 +23,10 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
-    "db:reset": "node scripts/reset-db.js && npm run db:seed"
+    "db:seed:math": "ts-node -r tsconfig-paths/register scripts/seed-math.ts",
+    "db:seed:english": "ts-node -r tsconfig-paths/register scripts/seed-english.ts",
+    "db:reset": "node scripts/reset-db.js && npm run db:seed",
+    "db:reset:all": "node scripts/reset-db.js && npm run db:seed:math && npm run db:seed:english"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

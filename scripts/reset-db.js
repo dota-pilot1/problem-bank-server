@@ -12,8 +12,26 @@ async function resetDatabase() {
   console.log('🗑️  Resetting database...');
 
   try {
-    // 각 테이블을 개별적으로 truncate (존재하지 않는 테이블은 무시)
-    const tables = [
+    // Math 테이블
+    const mathTables = [
+      'math_user_attempts',
+      'math_test_set_problems',
+      'math_test_sets',
+      'math_problems',
+      'math_chapters',
+    ];
+
+    // English 테이블
+    const englishTables = [
+      'english_user_attempts',
+      'english_test_set_problems',
+      'english_test_sets',
+      'english_problems',
+      'english_chapters',
+    ];
+
+    // 구 스키마 테이블 (호환성)
+    const oldTables = [
       'user_attempts',
       'test_set_problems',
       'test_sets',
@@ -22,6 +40,8 @@ async function resetDatabase() {
       'grades',
       'subjects',
     ];
+
+    const tables = [...mathTables, ...englishTables, ...oldTables];
 
     for (const table of tables) {
       try {
