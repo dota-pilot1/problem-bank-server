@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { MathChaptersService } from './math-chapters.service';
 import { MathProblemsService } from './math-problems.service';
+import { MathTestSetsService } from './math-test-sets.service';
 import { CreateMathChapterDto } from './dto/create-math-chapter.dto';
 import { CreateMathProblemDto } from './dto/create-math-problem.dto';
 
@@ -18,6 +19,7 @@ export class MathController {
   constructor(
     private readonly chaptersService: MathChaptersService,
     private readonly problemsService: MathProblemsService,
+    private readonly testSetsService: MathTestSetsService,
   ) {}
 
   // Chapters
@@ -76,5 +78,21 @@ export class MathController {
   @Delete('problems/:id')
   removeProblem(@Param('id') id: string) {
     return this.problemsService.remove(+id);
+  }
+
+  // Test Sets
+  @Get('test-sets')
+  findAllTestSets(@Query('gradeLevel') gradeLevel?: string) {
+    return this.testSetsService.findAll(gradeLevel ? +gradeLevel : undefined);
+  }
+
+  @Get('test-sets/:id')
+  findOneTestSet(@Param('id') id: string) {
+    return this.testSetsService.findOne(+id);
+  }
+
+  @Get('test-sets/:id/problems')
+  getTestSetProblems(@Param('id') id: string) {
+    return this.testSetsService.getTestSetProblems(+id);
   }
 }

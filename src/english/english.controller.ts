@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { EnglishChaptersService } from './english-chapters.service';
 import { EnglishProblemsService } from './english-problems.service';
+import { EnglishTestSetsService } from './english-test-sets.service';
 import { CreateEnglishChapterDto } from './dto/create-english-chapter.dto';
 import { CreateEnglishProblemDto } from './dto/create-english-problem.dto';
 
@@ -18,6 +19,7 @@ export class EnglishController {
   constructor(
     private readonly chaptersService: EnglishChaptersService,
     private readonly problemsService: EnglishProblemsService,
+    private readonly testSetsService: EnglishTestSetsService,
   ) {}
 
   // Chapters
@@ -76,5 +78,21 @@ export class EnglishController {
   @Delete('problems/:id')
   removeProblem(@Param('id') id: string) {
     return this.problemsService.remove(+id);
+  }
+
+  // Test Sets
+  @Get('test-sets')
+  findAllTestSets(@Query('gradeLevel') gradeLevel?: string) {
+    return this.testSetsService.findAll(gradeLevel ? +gradeLevel : undefined);
+  }
+
+  @Get('test-sets/:id')
+  findOneTestSet(@Param('id') id: string) {
+    return this.testSetsService.findOne(+id);
+  }
+
+  @Get('test-sets/:id/problems')
+  getTestSetProblems(@Param('id') id: string) {
+    return this.testSetsService.getTestSetProblems(+id);
   }
 }

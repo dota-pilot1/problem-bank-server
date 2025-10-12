@@ -86,6 +86,77 @@ async function seedMath() {
 
   console.log('✅ Math Problems created:', problems.length);
 
+  // 4. Math Test Sets 생성 (각 학년당 1개씩 = 총 3개)
+  const testSetsData = [
+    {
+      title: '중1 수학 종합 평가',
+      description: '중학교 1학년 전체 단원 종합 평가',
+      gradeLevel: 1,
+      testType: 'MIDTERM' as const,
+      totalQuestions: 10,
+      timeLimit: 30,
+      isActive: true,
+    },
+    {
+      title: '중2 수학 모의고사',
+      description: '중학교 2학년 모의고사',
+      gradeLevel: 2,
+      testType: 'MOCK' as const,
+      totalQuestions: 15,
+      timeLimit: 40,
+      isActive: true,
+    },
+    {
+      title: '중3 수학 실전 테스트',
+      description: '중학교 3학년 실전 대비 테스트',
+      gradeLevel: 3,
+      testType: 'FINAL' as const,
+      totalQuestions: 20,
+      timeLimit: 50,
+      isActive: true,
+    },
+  ];
+
+  const testSets = await db
+    .insert(schema.mathTestSets)
+    .values(testSetsData)
+    .returning();
+
+  console.log('✅ Math Test Sets created:', testSets.length);
+
+  // 5. Math Test Set Problems 연결 (각 시험지에 문제 추가)
+  const testSetProblemsData: any[] = [];
+
+  for (let i = 0; i < testSets.length; i++) {
+    const testSet = testSets[i];
+    const gradeLevel = i + 1;
+
+    // 해당 학년의 문제들만 필터링
+    const gradeProblems = problems.filter((p) => {
+      const chapter = chapters.find((c) => c.id === p.chapterId);
+      return chapter?.gradeLevel === gradeLevel;
+    });
+
+    // 각 시험지의 totalQuestions만큼 문제 추가
+    const selectedProblems = gradeProblems.slice(0, testSet.totalQuestions);
+
+    selectedProblems.forEach((problem, index) => {
+      testSetProblemsData.push({
+        testSetId: testSet.id,
+        problemId: problem.id,
+        orderIndex: index + 1,
+        score: 5,
+      });
+    });
+  }
+
+  await db
+    .insert(schema.mathTestSetProblems)
+    .values(testSetProblemsData)
+    .returning();
+
+  console.log('✅ Math Test Set Problems linked:', testSetProblemsData.length);
+
   await pool.end();
   console.log('🎉 Math seed completed!');
 }
