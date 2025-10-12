@@ -89,16 +89,34 @@ export const mathTestSetProblems = pgTable('math_test_set_problems', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// 5. Math User Attempts (수학 풀이 기록)
-export const mathUserAttempts = pgTable('math_user_attempts', {
+// 5. Math Test Sessions (수학 시험 세션) - 사용자의 시험 응시 기록
+export const mathTestSessions = pgTable('math_test_sessions', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull(),
-  testSetId: integer('test_set_id').references(() => mathTestSets.id),
+  testSetId: integer('test_set_id')
+    .references(() => mathTestSets.id)
+    .notNull(),
+  status: varchar('status', { length: 20 }).notNull().default('IN_PROGRESS'), // IN_PROGRESS, COMPLETED
+  currentQuestionIndex: integer('current_question_index').default(0).notNull(),
+  totalScore: integer('total_score').default(0).notNull(),
+  correctAnswers: integer('correct_answers').default(0).notNull(),
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// 6. Math User Answers (수학 답안 기록)
+export const mathUserAnswers = pgTable('math_user_answers', {
+  id: serial('id').primaryKey(),
+  sessionId: integer('session_id')
+    .references(() => mathTestSessions.id)
+    .notNull(),
   problemId: integer('problem_id')
     .references(() => mathProblems.id)
     .notNull(),
   userAnswer: varchar('user_answer', { length: 500 }).notNull(),
   isCorrect: boolean('is_correct').notNull(),
   responseTimeSeconds: integer('response_time_seconds'),
-  attemptedAt: timestamp('attempted_at').defaultNow().notNull(),
+  answeredAt: timestamp('answered_at').defaultNow().notNull(),
 });

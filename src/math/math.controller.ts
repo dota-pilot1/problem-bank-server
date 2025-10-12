@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   Query,
+  Request,
 } from '@nestjs/common';
 import { MathChaptersService } from './math-chapters.service';
 import { MathProblemsService } from './math-problems.service';
 import { MathTestSetsService } from './math-test-sets.service';
+import { MathTestSessionsService } from './math-test-sessions.service';
 import { CreateMathChapterDto } from './dto/create-math-chapter.dto';
 import { CreateMathProblemDto } from './dto/create-math-problem.dto';
 
@@ -20,6 +22,7 @@ export class MathController {
     private readonly chaptersService: MathChaptersService,
     private readonly problemsService: MathProblemsService,
     private readonly testSetsService: MathTestSetsService,
+    private readonly testSessionsService: MathTestSessionsService,
   ) {}
 
   // Chapters
@@ -94,5 +97,56 @@ export class MathController {
   @Get('test-sets/:id/problems')
   getTestSetProblems(@Param('id') id: string) {
     return this.testSetsService.getTestSetProblems(+id);
+  }
+
+  // Test Sessions (시험장)
+  @Post('test-sessions/start')
+  startTest(@Request() req, @Body() body: { testSetId: number }) {
+    const userId = req.user?.id || 1; // TODO: 실제 인증 구현
+    return this.testSessionsService.startTest(userId, body.testSetId);
+  }
+
+  @Get('test-sessions/:sessionId')
+  getSession(@Param('sessionId') sessionId: string) {
+    return this.testSessionsService.getSession(+sessionId);
+  }
+
+  @Get('test-sessions/:sessionId/current-question')
+  getCurrentQuestion(@Param('sessionId') sessionId: string) {
+    return this.testSessionsService.getCurrentQuestion(+sessionId);
+  }
+
+  @Post('test-sessions/:sessionId/answer')
+  submitAnswer(
+    @Param('sessionId') sessionId: string,
+    @Body()
+    body: {
+      problemId: number;
+      userAnswer: string;
+      responseTimeSeconds?: number;
+    },
+  ) {
+    return this.testSessionsService.submitAnswer(
+      +sessionId,
+      body.problemId,
+      body.userAnswer,
+      body.responseTimeSeconds,
+    );
+  }
+
+  @Get('test-sessions/:sessionId/result')
+  getResult(@Param('sessionId') sessionId: string) {
+    return this.testSessionsService.getResult(+sessionId);
+  }
+
+  @Get('test-sessions/user/:userId/history')
+  getUserTestHistory(
+    @Param('userId') userId: string,
+    @Query('testSetId') testSetId?: string,
+  ) {
+    return this.testSessionsService.getUserTestHistory(
+      +userId,
+      testSetId ? +testSetId : undefined,
+    );
   }
 }
