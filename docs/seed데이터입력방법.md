@@ -2,32 +2,54 @@
 
 ## 🚀 실행 명령어
 
-### 로컬 환경
+### 처음 실행 (테이블 생성 필요)
 
 ```bash
 cd problem-bank-server
-npm run db:reset
+npm run db:push    # 테이블 생성
+npm run db:seed    # 데이터 생성
+```
+
+### 이후 실행 (데이터 초기화)
+
+```bash
+cd problem-bank-server
+npm run db:reset   # 데이터 삭제 + 재생성
 ```
 
 ### EC2 환경
 
 ```bash
 cd ~/problem-bank-server
+
+# 처음 실행
+npm run db:push && npm run db:seed
+
+# 이후 실행
 npm run db:reset
 ```
 
 ## 📋 명령어 설명
 
-| 명령어             | 동작                       |
-| ------------------ | -------------------------- |
-| `npm run db:reset` | 전체 삭제 후 재생성 (권장) |
-| `npm run db:seed`  | 데이터 추가만 (기존 유지)  |
+| 명령어             | 동작                 | 사용 시점              |
+| ------------------ | -------------------- | ---------------------- |
+| `npm run db:push`  | 테이블 생성/수정     | 처음 or 스키마 변경 시 |
+| `npm run db:seed`  | 데이터 추가          | 데이터 생성            |
+| `npm run db:reset` | 데이터 삭제 + 재생성 | 초기화 필요 시         |
 
 ## ✅ 실행 결과
 
 ```
 🗑️  Resetting database...
+✓ Truncated user_attempts
+✓ Truncated test_set_problems
+✓ Truncated test_sets
+✓ Truncated problems
+✓ Truncated chapters
+✓ Truncated grades
+✓ Truncated subjects
 ✅ Database reset completed!
+
 🌱 Starting seed...
 ✅ Subjects created: 2
 ✅ Grades created: 3
