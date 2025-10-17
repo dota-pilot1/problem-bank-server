@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { eq } from 'drizzle-orm';
+import { eq, and, SQL } from 'drizzle-orm';
 import * as schema from '../drizzle/schema-english';
 import { DRIZZLE_ORM } from '../drizzle/drizzle.module';
 import { CreateEnglishProblemDto } from './dto/create-english-problem.dto';
@@ -20,13 +20,24 @@ export class EnglishProblemsService {
     return problem;
   }
 
-  async findAll(chapterId?: number) {
+  async findAll(chapterId?: number, difficulty?: string) {
+    const conditions: SQL[] = [];
+
     if (chapterId) {
+      conditions.push(eq(schema.englishProblems.chapterId, chapterId));
+    }
+
+    if (difficulty) {
+      conditions.push(eq(schema.englishProblems.difficulty, difficulty as any));
+    }
+
+    if (conditions.length > 0) {
       return await this.db
         .select()
         .from(schema.englishProblems)
-        .where(eq(schema.englishProblems.chapterId, chapterId));
+        .where(and(...conditions));
     }
+
     return await this.db.select().from(schema.englishProblems);
   }
 

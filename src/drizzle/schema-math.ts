@@ -11,9 +11,11 @@ import {
 
 // Enums (재사용)
 export const difficultyEnum = pgEnum('difficulty_math', [
-  'EASY',
-  'MEDIUM',
-  'HARD',
+  'LEVEL_1',
+  'LEVEL_2',
+  'LEVEL_3',
+  'LEVEL_4',
+  'LEVEL_5',
 ]);
 export const questionTypeEnum = pgEnum('question_type_math', [
   'MULTIPLE_CHOICE',

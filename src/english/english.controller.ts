@@ -61,8 +61,14 @@ export class EnglishController {
   }
 
   @Get('problems')
-  findAllProblems(@Query('chapterId') chapterId?: string) {
-    return this.problemsService.findAll(chapterId ? +chapterId : undefined);
+  findAllProblems(
+    @Query('chapterId') chapterId?: string,
+    @Query('difficulty') difficulty?: string,
+  ) {
+    return this.problemsService.findAll(
+      chapterId ? +chapterId : undefined,
+      difficulty,
+    );
   }
 
   @Get('problems/:id')

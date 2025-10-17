@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { eq } from 'drizzle-orm';
+import { eq, and, SQL } from 'drizzle-orm';
 import * as schema from '../drizzle/schema-math';
 import { DRIZZLE_ORM } from '../drizzle/drizzle.module';
 import { CreateMathProblemDto } from './dto/create-math-problem.dto';
@@ -20,13 +20,24 @@ export class MathProblemsService {
     return problem;
   }
 
-  async findAll(chapterId?: number) {
+  async findAll(chapterId?: number, difficulty?: string) {
+    const conditions: SQL[] = [];
+
     if (chapterId) {
+      conditions.push(eq(schema.mathProblems.chapterId, chapterId));
+    }
+
+    if (difficulty) {
+      conditions.push(eq(schema.mathProblems.difficulty, difficulty as any));
+    }
+
+    if (conditions.length > 0) {
       return await this.db
         .select()
         .from(schema.mathProblems)
-        .where(eq(schema.mathProblems.chapterId, chapterId));
+        .where(and(...conditions));
     }
+
     return await this.db.select().from(schema.mathProblems);
   }
 

@@ -52,30 +52,30 @@ async function seedEnglish() {
 
   console.log('✅ English Chapters created:', chapters.length);
 
-  // 3. English Problems 생성 (각 단원당 3문제 = 총 63문제)
+  // 3. English Problems 생성 (각 단원당 레벨별 3문제씩 = 총 315문제)
   const problemsData: any[] = [];
-  const difficulties: Array<'EASY' | 'MEDIUM' | 'HARD'> = [
-    'EASY',
-    'MEDIUM',
-    'HARD',
-  ];
+  const difficulties: Array<
+    'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5'
+  > = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4', 'LEVEL_5'];
 
   for (const chapter of chapters) {
-    for (let i = 0; i < 3; i++) {
-      problemsData.push({
-        chapterId: chapter.id,
-        questionType: 'MULTIPLE_CHOICE' as const,
-        difficulty: difficulties[i],
-        questionText: `${chapter.name} - ${difficulties[i]} 문제`,
-        option1: 'Option 1',
-        option2: 'Option 2',
-        option3: 'Option 3',
-        option4: 'Option 4',
-        correctAnswer: 'Option 1',
-        explanation: `${chapter.name}의 ${difficulties[i]} 난이도 문제 풀이`,
-        tags: `${chapter.name},중학영어`,
-        isActive: true,
-      });
+    for (const difficulty of difficulties) {
+      for (let problemNum = 1; problemNum <= 3; problemNum++) {
+        problemsData.push({
+          chapterId: chapter.id,
+          questionType: 'MULTIPLE_CHOICE' as const,
+          difficulty: difficulty,
+          questionText: `${chapter.name} - ${difficulty} 문제 ${problemNum}`,
+          option1: 'Option 1',
+          option2: 'Option 2',
+          option3: 'Option 3',
+          option4: 'Option 4',
+          correctAnswer: 'Option 1',
+          explanation: `${chapter.name}의 ${difficulty} 난이도 문제 ${problemNum} 풀이`,
+          tags: `${chapter.name},중학영어`,
+          isActive: true,
+        });
+      }
     }
   }
 
