@@ -34,11 +34,15 @@ export class UploadService {
       Key: fileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read',
+      // ACL 제거 - 버킷 정책으로 public 접근 허용
     });
 
-    await this.s3Client.send(command);
-
-    return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${fileName}`;
+    try {
+      await this.s3Client.send(command);
+      return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${fileName}`;
+    } catch (error) {
+      console.error('S3 Upload Error:', error);
+      throw error;
+    }
   }
 }
