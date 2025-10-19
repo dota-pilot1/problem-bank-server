@@ -3,6 +3,7 @@ export class CreateMathProblemDto {
   questionType: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER';
   difficulty: 'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5';
   questionText: string;
+  listeningText?: string; // 듣기 문제용 TTS 텍스트 (선택)
   option1?: string;
   option2?: string;
   option3?: string;

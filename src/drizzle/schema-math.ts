@@ -51,6 +51,7 @@ export const mathProblems = pgTable('math_problems', {
   questionType: questionTypeEnum('question_type').notNull(),
   difficulty: difficultyEnum('difficulty').notNull(),
   questionText: text('question_text').notNull(),
+  listeningText: text('listening_text'), // 듣기 문제용 TTS 텍스트 (선택)
   option1: varchar('option1', { length: 500 }),
   option2: varchar('option2', { length: 500 }),
   option3: varchar('option3', { length: 500 }),
