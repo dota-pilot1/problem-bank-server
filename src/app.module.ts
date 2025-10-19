@@ -9,6 +9,7 @@ import { TestSetsModule } from './test-sets/test-sets.module';
 import { GradesModule } from './grades/grades.module';
 import { MathModule } from './math/math.module';
 import { EnglishModule } from './english/english.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EnglishModule } from './english/english.module';
     TestSetsModule,
     MathModule,
     EnglishModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
