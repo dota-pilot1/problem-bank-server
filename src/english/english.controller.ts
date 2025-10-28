@@ -15,6 +15,7 @@ import { EnglishTestSetsService } from './english-test-sets.service';
 import { EnglishTestSessionsService } from './english-test-sessions.service';
 import { CreateEnglishChapterDto } from './dto/create-english-chapter.dto';
 import { CreateEnglishProblemDto } from './dto/create-english-problem.dto';
+import { CreateEnglishTestSetDto } from './dto/create-english-test-set.dto';
 
 @Controller('english')
 export class EnglishController {
@@ -90,6 +91,14 @@ export class EnglishController {
   }
 
   // Test Sets
+  @Post('test-sets')
+  createTestSet(@Body() dto: CreateEnglishTestSetDto) {
+    return this.testSetsService.create({
+      ...dto,
+      totalQuestions: 0,
+    });
+  }
+
   @Get('test-sets')
   findAllTestSets(@Query('gradeLevel') gradeLevel?: string) {
     return this.testSetsService.findAll(gradeLevel ? +gradeLevel : undefined);
@@ -100,9 +109,45 @@ export class EnglishController {
     return this.testSetsService.findOne(+id);
   }
 
+  @Patch('test-sets/:id')
+  updateTestSet(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateEnglishTestSetDto>,
+  ) {
+    return this.testSetsService.update(+id, dto);
+  }
+
+  @Delete('test-sets/:id')
+  removeTestSet(@Param('id') id: string) {
+    return this.testSetsService.remove(+id);
+  }
+
   @Get('test-sets/:id/problems')
   getTestSetProblems(@Param('id') id: string) {
     return this.testSetsService.getTestSetProblems(+id);
+  }
+
+  @Post('test-sets/:testSetId/problems')
+  addProblemToTestSet(
+    @Param('testSetId') testSetId: string,
+    @Body() body: { problemId: number; score?: number },
+  ) {
+    return this.testSetsService.addProblemToTestSet(
+      +testSetId,
+      body.problemId,
+      body.score || 1,
+    );
+  }
+
+  @Delete('test-sets/:testSetId/problems/:problemId')
+  removeProblemFromTestSet(
+    @Param('testSetId') testSetId: string,
+    @Param('problemId') problemId: string,
+  ) {
+    return this.testSetsService.removeProblemFromTestSet(
+      +testSetId,
+      +problemId,
+    );
   }
 
   // Test Sessions (시험장)

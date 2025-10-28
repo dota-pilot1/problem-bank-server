@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as schema from '../drizzle/schema-english';
 import { DRIZZLE_ORM } from '../drizzle/drizzle.module';
 import { CreateEnglishChapterDto } from './dto/create-english-chapter.dto';
@@ -56,5 +56,34 @@ export class EnglishChaptersService {
       .delete(schema.englishChapters)
       .where(eq(schema.englishChapters.id, id));
     return { deleted: true };
+  }
+
+  async getOrCreateTestSetChapter(gradeLevel: number) {
+    // "시험지 문제" 단원이 이미 있는지 확인
+    const [existingChapter] = await this.db
+      .select()
+      .from(schema.englishChapters)
+      .where(
+        and(
+          eq(schema.englishChapters.gradeLevel, gradeLevel),
+          eq(schema.englishChapters.name, '시험지 문제'),
+        ),
+      );
+
+    if (existingChapter) {
+      return existingChapter;
+    }
+
+    // 없으면 생성
+    const [newChapter] = await this.db
+      .insert(schema.englishChapters)
+      .values({
+        gradeLevel,
+        name: '시험지 문제',
+        orderIndex: 999, // 맨 마지막에 배치
+      })
+      .returning();
+
+    return newChapter;
   }
 }

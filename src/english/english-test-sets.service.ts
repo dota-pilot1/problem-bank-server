@@ -8,7 +8,7 @@ export interface CreateEnglishTestSetDto {
   title: string;
   description?: string;
   gradeLevel: number;
-  testType: 'MIDTERM' | 'MOCK' | 'FINAL';
+  testType: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'MIDTERM' | 'FINAL' | 'MOCK';
   totalQuestions: number;
   timeLimit?: number;
   isActive?: boolean;
@@ -89,5 +89,59 @@ export class EnglishTestSetsService {
         eq(schema.englishTestSetProblems.problemId, schema.englishProblems.id),
       )
       .where(eq(schema.englishTestSetProblems.testSetId, testSetId));
+  }
+
+  async addProblemToTestSet(
+    testSetId: number,
+    problemId: number,
+    score: number = 1,
+  ) {
+    // 현재 문제 개수 조회하여 orderIndex 결정
+    const existingProblems = await this.db
+      .select()
+      .from(schema.englishTestSetProblems)
+      .where(eq(schema.englishTestSetProblems.testSetId, testSetId));
+
+    const orderIndex = existingProblems.length;
+
+    const [result] = await this.db
+      .insert(schema.englishTestSetProblems)
+      .values({
+        testSetId,
+        problemId,
+        orderIndex,
+        score,
+      })
+      .returning();
+
+    // totalQuestions 업데이트
+    await this.db
+      .update(schema.englishTestSets)
+      .set({ totalQuestions: existingProblems.length + 1 })
+      .where(eq(schema.englishTestSets.id, testSetId));
+
+    return result;
+  }
+
+  async removeProblemFromTestSet(testSetId: number, problemId: number) {
+    await this.db
+      .delete(schema.englishTestSetProblems)
+      .where(
+        eq(schema.englishTestSetProblems.testSetId, testSetId) &&
+          eq(schema.englishTestSetProblems.problemId, problemId),
+      );
+
+    // totalQuestions 업데이트
+    const remainingProblems = await this.db
+      .select()
+      .from(schema.englishTestSetProblems)
+      .where(eq(schema.englishTestSetProblems.testSetId, testSetId));
+
+    await this.db
+      .update(schema.englishTestSets)
+      .set({ totalQuestions: remainingProblems.length })
+      .where(eq(schema.englishTestSets.id, testSetId));
+
+    return { message: 'Problem removed successfully' };
   }
 }
