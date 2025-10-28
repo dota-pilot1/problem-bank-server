@@ -3,7 +3,11 @@ import { Pool } from 'pg';
 import { listeningQuestions } from '../src/drizzle/schema-listening';
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: 'localhost',
+  port: 5433,
+  user: 'user',
+  password: 'password',
+  database: 'problem-bank',
 });
 
 const db = drizzle(pool);
@@ -30,7 +34,12 @@ async function seed() {
           { role: 'USER', message: 'No, that is all. Thank you!' },
         ],
       },
-      choices: ['Small pizza', 'Medium pizza', 'Large pizza', 'Extra large pizza'],
+      choices: [
+        'Small pizza',
+        'Medium pizza',
+        'Large pizza',
+        'Extra large pizza',
+      ],
       correctAnswer: 'C',
       difficulty: 2,
     },
@@ -44,12 +53,17 @@ async function seed() {
           { role: 'USER', message: 'Where should we meet tomorrow?' },
           {
             role: 'CHATBOT',
-            message: "How about the coffee shop near the library?",
+            message: 'How about the coffee shop near the library?',
           },
           { role: 'USER', message: 'Sounds good! See you at 3 PM.' },
         ],
       },
-      choices: ['At the library', 'At the coffee shop', 'At the park', 'At the school'],
+      choices: [
+        'At the library',
+        'At the coffee shop',
+        'At the park',
+        'At the school',
+      ],
       correctAnswer: 'B',
       difficulty: 1,
     },
