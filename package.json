@@ -25,6 +25,7 @@
     "db:seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "db:seed:math": "ts-node -r tsconfig-paths/register scripts/seed-math.ts",
     "db:seed:english": "ts-node -r tsconfig-paths/register scripts/seed-english.ts",
+    "db:seed:listening": "ts-node -r tsconfig-paths/register scripts/seed-listening.ts",
     "db:reset": "node scripts/reset-db.js && npm run db:seed",
     "db:reset:all": "node scripts/reset-db.js && npm run db:seed:math && npm run db:seed:english"
   },
