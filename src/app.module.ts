@@ -12,6 +12,7 @@ import { MathModule } from './math/math.module';
 import { EnglishModule } from './english/english.module';
 import { UploadModule } from './upload/upload.module';
 import { ListeningScriptsModule } from './listening-scripts/listening-scripts.module';
+import { ListeningQuestionsModule } from './listening-questions/listening-questions.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ListeningScriptsModule } from './listening-scripts/listening-scripts.mo
     EnglishModule,
     UploadModule,
     ListeningScriptsModule,
+    ListeningQuestionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

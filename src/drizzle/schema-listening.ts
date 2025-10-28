@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   pgEnum,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 // Enum for script style types
@@ -17,6 +18,9 @@ export const scriptStyleEnum = pgEnum('script_style_type', [
   'INTERVIEW',
   'NEWS',
 ]);
+
+// Enum for listening types
+export const listeningTypeEnum = pgEnum('listening_type', ['text', 'script']);
 
 // 1. Listening Script Categories (카테고리)
 export const listeningScriptCategories = pgTable(
@@ -60,3 +64,25 @@ export const listeningScriptExampleMessages = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
 );
+
+// 4. Listening Questions (듣기 문제)
+export const listeningQuestions = pgTable('listening_questions', {
+  id: serial('id').primaryKey(),
+  subject: varchar('subject', { length: 50 }).notNull(), // "영어", "수학", "과학" 등
+  questionText: text('question_text').notNull(), // 문제 텍스트
+  listeningType: listeningTypeEnum('listening_type').notNull(), // "text" or "script"
+  listeningText: text('listening_text'), // 일반 TTS용 텍스트
+  script: jsonb('script').$type<{
+    // 대화형 스크립트 (JSONB)
+    title: string;
+    messages: Array<{
+      role: 'USER' | 'CHATBOT';
+      message: string;
+    }>;
+  }>(),
+  choices: jsonb('choices').$type<string[]>().notNull(), // 선택지 ["A", "B", "C", "D"]
+  correctAnswer: varchar('correct_answer', { length: 1 }).notNull(), // 정답
+  difficulty: integer('difficulty').notNull(), // 난이도 1-5
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
