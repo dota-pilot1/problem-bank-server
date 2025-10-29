@@ -86,10 +86,10 @@ export const englishTestSets = pgTable('english_test_sets', {
 export const englishTestSetProblems = pgTable('english_test_set_problems', {
   id: serial('id').primaryKey(),
   testSetId: integer('test_set_id')
-    .references(() => englishTestSets.id)
+    .references(() => englishTestSets.id, { onDelete: 'cascade' })
     .notNull(),
   problemId: integer('problem_id')
-    .references(() => englishProblems.id)
+    .references(() => englishProblems.id, { onDelete: 'cascade' })
     .notNull(),
   orderIndex: integer('order_index').notNull(),
   score: integer('score').default(1).notNull(),
