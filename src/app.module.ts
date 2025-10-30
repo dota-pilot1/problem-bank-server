@@ -16,6 +16,7 @@ import { ListeningQuestionsModule } from './listening-questions/listening-questi
 import { SharedTestResultsModule } from './shared-test-results/shared-test-results.module';
 import { SharedTestResultsService } from './shared-test-results.service';
 import { SharedTestResultsController } from './shared-test-results.controller';
+import { ExamHallBookmarksModule } from './exam-hall-bookmarks.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SharedTestResultsController } from './shared-test-results.controller';
     ListeningScriptsModule,
     ListeningQuestionsModule,
     SharedTestResultsModule,
+    ExamHallBookmarksModule,
   ],
   controllers: [AppController, SharedTestResultsController],
   providers: [AppService, SharedTestResultsService],

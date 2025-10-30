@@ -143,3 +143,22 @@ export const sharedTestResults = pgTable('shared_test_results', {
   timeSpentSeconds: integer('time_spent_seconds'),
   completedAt: timestamp('completed_at').defaultNow().notNull(),
 });
+
+// 8. Exam Hall Bookmarks (시험장 북마크)
+export const examHallBookmarks = pgTable(
+  'exam_hall_bookmarks',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull(), // Spring Boot 사용자 ID
+    testSetId: integer('test_set_id').notNull(),
+    subject: varchar('subject', { length: 20 }).notNull(), // 'ENGLISH' or 'MATH'
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    // unique constraint: 한 사용자가 동일 시험을 중복 북마크할 수 없음
+    uniqueUserTestSubject: {
+      columns: [table.userId, table.testSetId, table.subject],
+      name: 'unique_user_test_subject',
+    },
+  }),
+);
