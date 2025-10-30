@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   pgEnum,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 // Enums
@@ -126,4 +127,19 @@ export const userAttempts = pgTable('user_attempts', {
   isCorrect: boolean('is_correct').notNull(),
   responseTimeSeconds: integer('response_time_seconds'),
   attemptedAt: timestamp('attempted_at').defaultNow().notNull(),
+});
+
+// 7. Shared Test Results (공유 시험 결과)
+// 주의: testSetId는 foreign key 없음 (math/english 시험지 모두 지원)
+export const sharedTestResults = pgTable('shared_test_results', {
+  id: serial('id').primaryKey(),
+  testSetId: integer('test_set_id').notNull(), // foreign key 제거 (영어/수학 시험지 모두 지원)
+  userId: integer('user_id'), // nullable (로그인 사용자)
+  guestId: varchar('guest_id', { length: 36 }), // nullable (비로그인 사용자 UUID)
+  userName: varchar('user_name', { length: 100 }), // 사용자 이름 (로그인: username, 비로그인: "익명사용자")
+  totalScore: integer('total_score').notNull(),
+  earnedScore: integer('earned_score').notNull(),
+  answers: jsonb('answers').notNull(), // 답안 배열 JSON
+  timeSpentSeconds: integer('time_spent_seconds'),
+  completedAt: timestamp('completed_at').defaultNow().notNull(),
 });

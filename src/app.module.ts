@@ -13,6 +13,9 @@ import { EnglishModule } from './english/english.module';
 import { UploadModule } from './upload/upload.module';
 import { ListeningScriptsModule } from './listening-scripts/listening-scripts.module';
 import { ListeningQuestionsModule } from './listening-questions/listening-questions.module';
+import { SharedTestResultsModule } from './shared-test-results/shared-test-results.module';
+import { SharedTestResultsService } from './shared-test-results.service';
+import { SharedTestResultsController } from './shared-test-results.controller';
 
 @Module({
   imports: [
@@ -31,8 +34,9 @@ import { ListeningQuestionsModule } from './listening-questions/listening-questi
     UploadModule,
     ListeningScriptsModule,
     ListeningQuestionsModule,
+    SharedTestResultsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, SharedTestResultsController],
+  providers: [AppService, SharedTestResultsService],
 })
 export class AppModule {}
