@@ -165,4 +165,19 @@ export class SharedTestResultsService {
       rankings,
     };
   }
+
+  async resetRanking(
+    testSetId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    // 해당 시험지의 모든 결과 삭제
+    const deleted = await this.db
+      .delete(schema.sharedTestResults)
+      .where(eq(schema.sharedTestResults.testSetId, testSetId))
+      .returning();
+
+    return {
+      success: true,
+      message: `${deleted.length}개의 결과가 삭제되었습니다.`,
+    };
+  }
 }

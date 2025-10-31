@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -36,5 +37,12 @@ export class SharedTestResultsController {
       userId ? parseInt(userId) : undefined,
       guestId,
     );
+  }
+
+  @Delete(':testSetId/reset')
+  async resetRanking(
+    @Param('testSetId', ParseIntPipe) testSetId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.sharedTestResultsService.resetRanking(testSetId);
   }
 }
