@@ -16,7 +16,7 @@ import { MathTestSessionsService } from './math-test-sessions.service';
 import { CreateMathChapterDto } from './dto/create-math-chapter.dto';
 import { CreateMathProblemDto } from './dto/create-math-problem.dto';
 
-@Controller('math')
+@Controller('api/math')
 export class MathController {
   constructor(
     private readonly chaptersService: MathChaptersService,
