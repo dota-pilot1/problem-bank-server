@@ -17,7 +17,7 @@ import { CreateEnglishChapterDto } from './dto/create-english-chapter.dto';
 import { CreateEnglishProblemDto } from './dto/create-english-problem.dto';
 import { CreateEnglishTestSetDto } from './dto/create-english-test-set.dto';
 
-@Controller('api/english')
+@Controller('english')
 export class EnglishController {
   constructor(
     private readonly chaptersService: EnglishChaptersService,
