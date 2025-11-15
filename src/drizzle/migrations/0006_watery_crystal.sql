@@ -1,0 +1,1 @@
+ALTER TABLE "questions" ALTER COLUMN "audio_text" SET DATA TYPE jsonb;

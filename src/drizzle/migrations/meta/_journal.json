@@ -36,6 +36,27 @@
       "when": 1761780023277,
       "tag": "0004_bitter_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1763170270888,
+      "tag": "0005_thin_praxagora",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1763171274092,
+      "tag": "0006_watery_crystal",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1763172000000,
+      "tag": "0007_chat_scripts",
+      "breakpoints": true
     }
   ]
 }

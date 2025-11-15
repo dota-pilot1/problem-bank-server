@@ -2,6 +2,7 @@ import type { Config } from 'drizzle-kit';
 
 export default {
   schema: [
+    './src/drizzle/schema-tree.ts', // 새로운 트리 구조 스키마
     './src/drizzle/schema.ts',
     './src/drizzle/schema-math.ts',
     './src/drizzle/schema-english.ts',
