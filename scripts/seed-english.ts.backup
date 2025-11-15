@@ -1,0 +1,277 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from '../src/drizzle/schema-english';
+
+async function seedEnglish() {
+  const pool = new Pool({
+    host: 'localhost',
+    port: 5433,
+    user: 'user',
+    password: 'password',
+    database: 'problem-bank',
+  });
+
+  const db = drizzle(pool, { schema });
+
+  console.log('🌱 Starting English seed...');
+
+  // 1. English Chapters 생성 (중1만, 3개 단원)
+  const chaptersData = [
+    { gradeLevel: 1, name: '인사와 소개', orderIndex: 1 },
+    { gradeLevel: 1, name: '독해', orderIndex: 2 },
+    { gradeLevel: 1, name: '문법', orderIndex: 3 },
+  ];
+
+  const chapters = await db
+    .insert(schema.englishChapters)
+    .values(chaptersData)
+    .returning();
+
+  console.log('✅ English Chapters created:', chapters.length);
+
+  // 2. English Problems 생성 (각 단원당 레벨별 1문제씩 = 총 15문제)
+  const problemsData: any[] = [];
+  const difficulties: Array<
+    'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5'
+  > = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4', 'LEVEL_5'];
+
+  const sampleQuestions = {
+    '인사와 소개': {
+      LEVEL_1: {
+        question: 'What size coffee did the customer order?',
+        options: ['Tall', 'Grande', 'Venti', 'Short'],
+        correct: 'Grande',
+        explanation: 'The dialogue mentions ordering a Grande size coffee.',
+      },
+      LEVEL_2: {
+        question: 'Where is the library located?',
+        options: [
+          'Next to the park',
+          'Across from the station',
+          'Behind the school',
+          'Near the hospital',
+        ],
+        correct: 'Across from the station',
+        explanation: 'The person said the library is across from the station.',
+      },
+      LEVEL_3: {
+        question: "What is the speaker's profession?",
+        options: ['Teacher', 'Engineer', 'Doctor', 'Artist'],
+        correct: 'Engineer',
+        explanation:
+          'The speaker introduced themselves as a software engineer.',
+      },
+      LEVEL_4: {
+        question: 'Why did they cancel the meeting?',
+        options: [
+          'Bad weather',
+          'Technical issues',
+          'Schedule conflict',
+          'Lack of preparation',
+        ],
+        correct: 'Schedule conflict',
+        explanation: 'The email mentioned a scheduling conflict as the reason.',
+      },
+      LEVEL_5: {
+        question: 'What does the author imply about technology?',
+        options: [
+          "It's always beneficial",
+          'It requires careful management',
+          "It's harmful to society",
+          "It's unnecessary",
+        ],
+        correct: 'It requires careful management',
+        explanation:
+          'The passage suggests technology needs thoughtful implementation.',
+      },
+    },
+    독해: {
+      LEVEL_1: {
+        question: 'How long does it take to walk to the subway station?',
+        options: [
+          'About 2 minutes',
+          'About 5 minutes',
+          'About 10 minutes',
+          'About 15 minutes',
+        ],
+        correct: 'About 10 minutes',
+        explanation: 'The text states it takes about 10 minutes on foot.',
+      },
+      LEVEL_2: {
+        question: 'What will the weather be like tomorrow?',
+        options: ['Sunny', 'Rainy', 'Snowy', 'Cloudy'],
+        correct: 'Rainy',
+        explanation: 'The forecast predicts rain for tomorrow.',
+      },
+      LEVEL_3: {
+        question: 'What is the main idea of the passage?',
+        options: [
+          'Benefits of exercise',
+          'History of sports',
+          'Types of food',
+          'Travel destinations',
+        ],
+        correct: 'Benefits of exercise',
+        explanation:
+          'The passage primarily discusses how exercise improves health.',
+      },
+      LEVEL_4: {
+        question: 'What can be inferred about the character?',
+        options: [
+          'They are optimistic',
+          'They are pessimistic',
+          'They are indifferent',
+          'They are confused',
+        ],
+        correct: 'They are optimistic',
+        explanation:
+          "The character's actions and dialogue suggest a positive outlook.",
+      },
+      LEVEL_5: {
+        question:
+          'According to the article, what is the most significant factor?',
+        options: [
+          'Economic growth',
+          'Environmental protection',
+          'Social equality',
+          'Technological advancement',
+        ],
+        correct: 'Environmental protection',
+        explanation:
+          'The article emphasizes environmental concerns above other factors.',
+      },
+    },
+    문법: {
+      LEVEL_1: {
+        question: 'Choose the correct verb form: She ___ to school every day.',
+        options: ['go', 'goes', 'going', 'went'],
+        correct: 'goes',
+        explanation: "Third person singular present tense requires 'goes'.",
+      },
+      LEVEL_2: {
+        question: 'Which sentence is grammatically correct?',
+        options: [
+          "He don't like pizza",
+          "He doesn't likes pizza",
+          "He doesn't like pizza",
+          'He not like pizza',
+        ],
+        correct: "He doesn't like pizza",
+        explanation:
+          "Correct negative form with third person singular is 'doesn't like'.",
+      },
+      LEVEL_3: {
+        question:
+          'Complete the sentence: If I ___ rich, I would travel the world.',
+        options: ['am', 'was', 'were', 'be'],
+        correct: 'were',
+        explanation:
+          "Subjunctive mood uses 'were' for hypothetical situations.",
+      },
+      LEVEL_4: {
+        question:
+          'Identify the error: The book, which I bought yesterday, are very interesting.',
+        options: ['which', 'bought', 'are', 'interesting'],
+        correct: 'are',
+        explanation: "Should be 'is' because the subject 'book' is singular.",
+      },
+      LEVEL_5: {
+        question:
+          'Choose the most appropriate tense: By next year, I ___ here for five years.',
+        options: [
+          'will work',
+          'will have worked',
+          'will be working',
+          'would have worked',
+        ],
+        correct: 'will have worked',
+        explanation:
+          'Future perfect tense for an action completed by a future time.',
+      },
+    },
+  };
+
+  for (const chapter of chapters) {
+    const chapterQuestions =
+      sampleQuestions[chapter.name as keyof typeof sampleQuestions];
+
+    for (const difficulty of difficulties) {
+      const questionData = chapterQuestions[difficulty];
+
+      problemsData.push({
+        chapterId: chapter.id,
+        questionType: 'MULTIPLE_CHOICE' as const,
+        difficulty: difficulty,
+        questionText: questionData.question,
+        option1: questionData.options[0],
+        option2: questionData.options[1],
+        option3: questionData.options[2],
+        option4: questionData.options[3],
+        correctAnswer: questionData.correct,
+        explanation: questionData.explanation,
+        tags: `${chapter.name},중학영어`,
+        isActive: true,
+      });
+    }
+  }
+
+  const problems = await db
+    .insert(schema.englishProblems)
+    .values(problemsData)
+    .returning();
+
+  console.log('✅ English Problems created:', problems.length);
+
+  // 3. English Test Sets 생성 (중1만 1개)
+  const testSetsData = [
+    {
+      title: '중1 영어 종합 평가',
+      description: '중학교 1학년 영어 테스트',
+      gradeLevel: 1,
+      testType: 'MIDTERM' as const,
+      totalQuestions: 10,
+      timeLimit: 30,
+      isActive: true,
+    },
+  ];
+
+  const testSets = await db
+    .insert(schema.englishTestSets)
+    .values(testSetsData)
+    .returning();
+
+  console.log('✅ English Test Sets created:', testSets.length);
+
+  // 4. English Test Set Problems 연결
+  const testSetProblemsData: any[] = [];
+  const testSet = testSets[0];
+  const selectedProblems = problems.slice(0, testSet.totalQuestions);
+
+  selectedProblems.forEach((problem, index) => {
+    testSetProblemsData.push({
+      testSetId: testSet.id,
+      problemId: problem.id,
+      orderIndex: index + 1,
+      score: 5,
+    });
+  });
+
+  await db
+    .insert(schema.englishTestSetProblems)
+    .values(testSetProblemsData)
+    .returning();
+
+  console.log(
+    '✅ English Test Set Problems linked:',
+    testSetProblemsData.length,
+  );
+
+  await pool.end();
+  console.log('🎉 English seed completed!');
+  console.log('📊 Summary: 3 chapters, 15 problems, 1 test set');
+}
+
+seedEnglish().catch((error) => {
+  console.error('❌ Seed failed:', error);
+  process.exit(1);
+});

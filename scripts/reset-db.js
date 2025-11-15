@@ -41,7 +41,15 @@ async function resetDatabase() {
       'subjects',
     ];
 
-    const tables = [...mathTables, ...englishTables, ...oldTables];
+    // 새 통합 스키마 테이블 (schema-tree.ts)
+    const newTables = ['questions', 'categories', 'chat_scripts'];
+
+    const tables = [
+      ...mathTables,
+      ...englishTables,
+      ...oldTables,
+      ...newTables,
+    ];
 
     for (const table of tables) {
       try {

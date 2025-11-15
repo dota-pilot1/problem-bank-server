@@ -40,6 +40,7 @@ export const englishChapters = pgTable('english_chapters', {
   id: serial('id').primaryKey(),
   gradeLevel: integer('grade_level').notNull(), // 1(중1), 2(중2), 3(중3)
   name: varchar('name', { length: 200 }).notNull(),
+  parentId: integer('parent_id').references((): any => englishChapters.id), // 계층 구조 지원
   orderIndex: integer('order_index').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

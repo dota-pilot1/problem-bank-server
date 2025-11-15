@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schema from '../src/drizzle/schema-math';
+import * as schema from '../src/drizzle/schema-tree';
 
 async function seedMath() {
   const pool = new Pool({
@@ -13,152 +13,266 @@ async function seedMath() {
 
   const db = drizzle(pool, { schema });
 
-  console.log('🌱 Starting Math seed...');
+  console.log('🌱 Starting Math seed (categories table)...');
 
-  // 1. Math Chapters 생성 (중1 7단원, 중2 7단원, 중3 7단원 = 총 21단원)
-  const chaptersData = [
-    // 중1 (7단원) - gradeLevel: 1
-    { gradeLevel: 1, name: '소인수분해', orderIndex: 1 },
-    { gradeLevel: 1, name: '정수와 유리수', orderIndex: 2 },
-    { gradeLevel: 1, name: '문자와 식', orderIndex: 3 },
-    { gradeLevel: 1, name: '일차방정식', orderIndex: 4 },
-    { gradeLevel: 1, name: '좌표평면과 그래프', orderIndex: 5 },
-    { gradeLevel: 1, name: '통계', orderIndex: 6 },
-    { gradeLevel: 1, name: '기본 도형', orderIndex: 7 },
+  // 1. 최상위 단원 생성 (2개)
+  const topCategories = (await db
+    .insert(schema.categories)
+    .values([
+      {
+        name: '정수와 유리수',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        orderIndex: 1,
+        parentId: null,
+      },
+      {
+        name: '일차방정식',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        orderIndex: 2,
+        parentId: null,
+      },
+    ])
+    .returning()) as any[];
 
-    // 중2 (7단원) - gradeLevel: 2
-    { gradeLevel: 2, name: '유리수와 순환소수', orderIndex: 1 },
-    { gradeLevel: 2, name: '단항식의 계산', orderIndex: 2 },
-    { gradeLevel: 2, name: '다항식의 계산', orderIndex: 3 },
-    { gradeLevel: 2, name: '일차부등식', orderIndex: 4 },
-    { gradeLevel: 2, name: '연립일차방정식', orderIndex: 5 },
-    { gradeLevel: 2, name: '일차함수', orderIndex: 6 },
-    { gradeLevel: 2, name: '확률', orderIndex: 7 },
+  console.log('✅ Top categories created:', topCategories.length);
 
-    // 중3 (7단원) - gradeLevel: 3
-    { gradeLevel: 3, name: '제곱근과 실수', orderIndex: 1 },
-    { gradeLevel: 3, name: '다항식의 곱셈', orderIndex: 2 },
-    { gradeLevel: 3, name: '인수분해', orderIndex: 3 },
-    { gradeLevel: 3, name: '이차방정식', orderIndex: 4 },
-    { gradeLevel: 3, name: '이차함수', orderIndex: 5 },
-    { gradeLevel: 3, name: '삼각비', orderIndex: 6 },
-    { gradeLevel: 3, name: '원의 성질', orderIndex: 7 },
+  // 2. 각 단원 하위에 기초/응용 카테고리 생성
+  const subCategories = (await db
+    .insert(schema.categories)
+    .values([
+      {
+        name: '기초',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[0].id,
+        orderIndex: 1,
+      },
+      {
+        name: '응용',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[0].id,
+        orderIndex: 2,
+      },
+      {
+        name: '기초',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[1].id,
+        orderIndex: 1,
+      },
+      {
+        name: '응용',
+        subject: 'MATH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[1].id,
+        orderIndex: 2,
+      },
+    ])
+    .returning()) as any[];
+
+  console.log('✅ Sub categories created:', subCategories.length);
+
+  // 3. 문제 생성 (각 카테고리당 5문제)
+  const questionsData: any[] = [];
+
+  const questionSets = [
+    {
+      category: subCategories[0], // 정수와 유리수 > 기초
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: '(-3) + 5 = ?',
+          options: ['2', '-2', '8', '-8'],
+          correctAnswer: '2',
+          explanation: '음수 -3에 양수 5를 더하면 2입니다.',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: '(-4) × 3 = ?',
+          options: ['-12', '12', '-7', '7'],
+          correctAnswer: '-12',
+          explanation: '음수와 양수를 곱하면 음수가 됩니다.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: '8 ÷ (-2) = ?',
+          options: ['-4', '4', '-6', '6'],
+          correctAnswer: '-4',
+          explanation: '양수를 음수로 나누면 음수가 됩니다.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: '(-2) × (-3) × 4 = ?',
+          options: ['24', '-24', '12', '-12'],
+          correctAnswer: '24',
+          explanation: '음수끼리 곱하면 양수, 양수를 곱하면 양수입니다.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: '(-15) ÷ 3 + 8 = ?',
+          options: ['3', '-3', '13', '-13'],
+          correctAnswer: '3',
+          explanation: '-15 ÷ 3 = -5, -5 + 8 = 3입니다.',
+        },
+      ],
+    },
+    {
+      category: subCategories[1], // 정수와 유리수 > 응용
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: '1/2 + 1/4 = ?',
+          options: ['1/6', '2/6', '3/4', '1/3'],
+          correctAnswer: '3/4',
+          explanation: '1/2 = 2/4이므로 2/4 + 1/4 = 3/4입니다.',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: '2/3 × 3/4 = ?',
+          options: ['1/2', '5/7', '6/12', '2/4'],
+          correctAnswer: '1/2',
+          explanation: '(2×3)/(3×4) = 6/12 = 1/2입니다.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: '5/6 ÷ 2/3 = ?',
+          options: ['5/4', '10/18', '5/9', '15/12'],
+          correctAnswer: '5/4',
+          explanation: '5/6 × 3/2 = 15/12 = 5/4입니다.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: '(-1/2) + 3/4 = ?',
+          options: ['1/4', '-1/4', '5/4', '-5/4'],
+          correctAnswer: '1/4',
+          explanation: '-2/4 + 3/4 = 1/4입니다.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: '(2/3 - 1/2) × 6 = ?',
+          options: ['1', '2', '3', '4'],
+          correctAnswer: '1',
+          explanation: '(4/6 - 3/6) × 6 = 1/6 × 6 = 1입니다.',
+        },
+      ],
+    },
+    {
+      category: subCategories[2], // 일차방정식 > 기초
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: 'x + 3 = 7일 때, x의 값은?',
+          options: ['3', '4', '5', '10'],
+          correctAnswer: '4',
+          explanation: 'x = 7 - 3 = 4입니다.',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: '2x = 10일 때, x의 값은?',
+          options: ['3', '4', '5', '6'],
+          correctAnswer: '5',
+          explanation: 'x = 10 ÷ 2 = 5입니다.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: '3x - 5 = 10일 때, x의 값은?',
+          options: ['3', '4', '5', '6'],
+          correctAnswer: '5',
+          explanation: '3x = 15이므로 x = 5입니다.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: '5x + 2 = 3x + 10일 때, x의 값은?',
+          options: ['2', '3', '4', '5'],
+          correctAnswer: '4',
+          explanation: '2x = 8이므로 x = 4입니다.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: '2(x + 3) = 14일 때, x의 값은?',
+          options: ['2', '3', '4', '5'],
+          correctAnswer: '4',
+          explanation: '2x + 6 = 14, 2x = 8, x = 4입니다.',
+        },
+      ],
+    },
+    {
+      category: subCategories[3], // 일차방정식 > 응용
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: '어떤 수의 3배에 4를 더하면 19가 된다. 이 수는?',
+          options: ['3', '4', '5', '6'],
+          correctAnswer: '5',
+          explanation: '3x + 4 = 19, 3x = 15, x = 5입니다.',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: '연속하는 두 정수의 합이 15일 때, 작은 수는?',
+          options: ['6', '7', '8', '9'],
+          correctAnswer: '7',
+          explanation: 'x + (x+1) = 15, 2x = 14, x = 7입니다.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText:
+            '형의 나이가 동생의 2배이고, 두 사람 나이의 합이 30살이다. 동생의 나이는?',
+          options: ['8살', '10살', '12살', '15살'],
+          correctAnswer: '10살',
+          explanation: 'x + 2x = 30, 3x = 30, x = 10입니다.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText:
+            '현재 사탕이 50개 있다. 하루에 3개씩 먹으면 며칠 후에 8개가 남는가?',
+          options: ['12일', '13일', '14일', '15일'],
+          correctAnswer: '14일',
+          explanation: '50 - 3x = 8, 3x = 42, x = 14입니다.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: '정가의 20% 할인한 가격이 8000원이다. 정가는?',
+          options: ['9000원', '9600원', '10000원', '12000원'],
+          correctAnswer: '10000원',
+          explanation: '0.8x = 8000, x = 10000입니다.',
+        },
+      ],
+    },
   ];
 
-  const chapters = await db
-    .insert(schema.mathChapters)
-    .values(chaptersData)
-    .returning();
-
-  console.log('✅ Math Chapters created:', chapters.length);
-
-  // 3. Math Problems 생성 (각 단원당 레벨별 3문제씩 = 총 315문제)
-  const problemsData: any[] = [];
-  const difficulties: Array<
-    'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5'
-  > = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4', 'LEVEL_5'];
-
-  for (const chapter of chapters) {
-    for (const difficulty of difficulties) {
-      for (let problemNum = 1; problemNum <= 3; problemNum++) {
-        problemsData.push({
-          chapterId: chapter.id,
-          questionType: 'MULTIPLE_CHOICE' as const,
-          difficulty: difficulty,
-          questionText: `${chapter.name} - ${difficulty} 문제 ${problemNum}`,
-          option1: '선택지 1',
-          option2: '선택지 2',
-          option3: '선택지 3',
-          option4: '선택지 4',
-          correctAnswer: '선택지 1',
-          explanation: `${chapter.name}의 ${difficulty} 난이도 문제 ${problemNum} 풀이`,
-          tags: `${chapter.name},중학수학`,
-          isActive: true,
-        });
-      }
-    }
-  }
-
-  const problems = await db
-    .insert(schema.mathProblems)
-    .values(problemsData)
-    .returning();
-
-  console.log('✅ Math Problems created:', problems.length);
-
-  // 4. Math Test Sets 생성 (각 학년당 1개씩 = 총 3개)
-  const testSetsData = [
-    {
-      title: '중1 수학 종합 평가',
-      description: '중학교 1학년 전체 단원 종합 평가',
-      gradeLevel: 1,
-      testType: 'MIDTERM' as const,
-      totalQuestions: 10,
-      timeLimit: 30,
-      isActive: true,
-    },
-    {
-      title: '중2 수학 모의고사',
-      description: '중학교 2학년 모의고사',
-      gradeLevel: 2,
-      testType: 'MOCK' as const,
-      totalQuestions: 15,
-      timeLimit: 40,
-      isActive: true,
-    },
-    {
-      title: '중3 수학 실전 테스트',
-      description: '중학교 3학년 실전 대비 테스트',
-      gradeLevel: 3,
-      testType: 'FINAL' as const,
-      totalQuestions: 20,
-      timeLimit: 50,
-      isActive: true,
-    },
-  ];
-
-  const testSets = await db
-    .insert(schema.mathTestSets)
-    .values(testSetsData)
-    .returning();
-
-  console.log('✅ Math Test Sets created:', testSets.length);
-
-  // 5. Math Test Set Problems 연결 (각 시험지에 문제 추가)
-  const testSetProblemsData: any[] = [];
-
-  for (let i = 0; i < testSets.length; i++) {
-    const testSet = testSets[i];
-    const gradeLevel = i + 1;
-
-    // 해당 학년의 문제들만 필터링
-    const gradeProblems = problems.filter((p) => {
-      const chapter = chapters.find((c) => c.id === p.chapterId);
-      return chapter?.gradeLevel === gradeLevel;
-    });
-
-    // 각 시험지의 totalQuestions만큼 문제 추가
-    const selectedProblems = gradeProblems.slice(0, testSet.totalQuestions);
-
-    selectedProblems.forEach((problem, index) => {
-      testSetProblemsData.push({
-        testSetId: testSet.id,
-        problemId: problem.id,
+  questionSets.forEach((set) => {
+    set.questions.forEach((q, index) => {
+      questionsData.push({
+        categoryId: set.category.id,
+        creatorType: 'SYSTEM' as const,
+        questionText: q.questionText,
+        options: JSON.stringify(q.options),
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        difficulty: q.difficulty,
+        tags: `${set.category.name},수학`,
+        isActive: true,
         orderIndex: index + 1,
-        score: 5,
       });
     });
-  }
+  });
 
-  await db
-    .insert(schema.mathTestSetProblems)
-    .values(testSetProblemsData)
+  const questions = await db
+    .insert(schema.questions)
+    .values(questionsData)
     .returning();
 
-  console.log('✅ Math Test Set Problems linked:', testSetProblemsData.length);
+  console.log('✅ Questions created:', questions.length);
 
   await pool.end();
   console.log('🎉 Math seed completed!');
+  console.log('📊 Summary:');
+  console.log('  - 2 top categories: 정수와 유리수, 일차방정식');
+  console.log('  - 4 sub categories: 각 단원별 기초/응용');
+  console.log('  - 20 questions: 각 카테고리별 5문제');
 }
 
 seedMath().catch((error) => {

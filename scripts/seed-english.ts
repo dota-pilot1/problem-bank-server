@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schema from '../src/drizzle/schema-english';
+import * as schema from '../src/drizzle/schema-tree';
 
 async function seedEnglish() {
   const pool = new Pool({
@@ -13,155 +13,276 @@ async function seedEnglish() {
 
   const db = drizzle(pool, { schema });
 
-  console.log('🌱 Starting English seed...');
+  console.log('🌱 Starting English seed (categories table)...');
 
-  // 1. English Chapters 생성 (중1 7단원, 중2 7단원, 중3 7단원 = 총 21단원)
-  const chaptersData = [
-    // 중1 (7단원) - gradeLevel: 1
-    { gradeLevel: 1, name: '인사와 소개', orderIndex: 1 },
-    { gradeLevel: 1, name: '일상생활', orderIndex: 2 },
-    { gradeLevel: 1, name: '가족과 친구', orderIndex: 3 },
-    { gradeLevel: 1, name: '학교생활', orderIndex: 4 },
-    { gradeLevel: 1, name: '취미와 여가', orderIndex: 5 },
-    { gradeLevel: 1, name: '음식과 식사', orderIndex: 6 },
-    { gradeLevel: 1, name: '시간과 날짜', orderIndex: 7 },
+  // 1. 최상위 단원 생성 (2개)
+  const topCategories = (await db
+    .insert(schema.categories)
+    .values([
+      {
+        name: '인사와 소개',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        orderIndex: 1,
+        parentId: null,
+      },
+      {
+        name: '일상생활',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        orderIndex: 2,
+        parentId: null,
+      },
+    ])
+    .returning()) as any[];
 
-    // 중2 (7단원) - gradeLevel: 2
-    { gradeLevel: 2, name: '여행과 교통', orderIndex: 1 },
-    { gradeLevel: 2, name: '쇼핑과 물건', orderIndex: 2 },
-    { gradeLevel: 2, name: '건강과 운동', orderIndex: 3 },
-    { gradeLevel: 2, name: '날씨와 계절', orderIndex: 4 },
-    { gradeLevel: 2, name: '직업과 진로', orderIndex: 5 },
-    { gradeLevel: 2, name: '문화와 축제', orderIndex: 6 },
-    { gradeLevel: 2, name: '환경과 자연', orderIndex: 7 },
+  console.log('✅ Top categories created:', topCategories.length);
 
-    // 중3 (7단원) - gradeLevel: 3
-    { gradeLevel: 3, name: '사회 문제', orderIndex: 1 },
-    { gradeLevel: 3, name: '과학과 기술', orderIndex: 2 },
-    { gradeLevel: 3, name: '역사와 인물', orderIndex: 3 },
-    { gradeLevel: 3, name: '예술과 음악', orderIndex: 4 },
-    { gradeLevel: 3, name: '스포츠와 게임', orderIndex: 5 },
-    { gradeLevel: 3, name: '미디어와 뉴스', orderIndex: 6 },
-    { gradeLevel: 3, name: '미래와 꿈', orderIndex: 7 },
+  // 2. 각 단원 하위에 독해/듣기 카테고리 생성
+  const subCategories = (await db
+    .insert(schema.categories)
+    .values([
+      {
+        name: '독해',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[0].id,
+        orderIndex: 1,
+      },
+      {
+        name: '듣기',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[0].id,
+        orderIndex: 2,
+      },
+      {
+        name: '독해',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[1].id,
+        orderIndex: 1,
+      },
+      {
+        name: '듣기',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        parentId: topCategories[1].id,
+        orderIndex: 2,
+      },
+    ])
+    .returning()) as any[];
+
+  console.log('✅ Sub categories created:', subCategories.length);
+
+  // 3. 문제 생성 (각 카테고리당 5문제)
+  const questionsData: any[] = [];
+
+  const questionSets = [
+    {
+      category: subCategories[0], // 인사와 소개 > 독해
+      passage: `Hello! My name is John. I am from New York. I am a student at Lincoln High School. I have two siblings - an older sister and a younger brother. I love playing basketball and reading books. Nice to meet you!`,
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: "What is the person's name?",
+          options: ['John', 'Mike', 'Sarah', 'Emily'],
+          correctAnswer: 'John',
+          explanation: 'The passage clearly states "My name is John".',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: 'Where is the speaker from?',
+          options: ['New York', 'London', 'Seoul', 'Tokyo'],
+          correctAnswer: 'New York',
+          explanation: 'The text mentions "I am from New York".',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: 'What does the person do?',
+          options: ['Teacher', 'Student', 'Engineer', 'Doctor'],
+          correctAnswer: 'Student',
+          explanation: 'The passage indicates they are a student.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: 'How many siblings does the speaker have?',
+          options: ['None', 'One', 'Two', 'Three'],
+          correctAnswer: 'Two',
+          explanation: 'The text states "I have two siblings".',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: "What can we infer about the speaker's personality?",
+          options: ['Outgoing', 'Shy', 'Serious', 'Lazy'],
+          correctAnswer: 'Outgoing',
+          explanation:
+            "The speaker's friendly introduction suggests an outgoing personality.",
+        },
+      ],
+    },
+    {
+      category: subCategories[1], // 인사와 소개 > 듣기
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: 'What greeting did they use?',
+          options: ['Hello', 'Good morning', 'Hi there', 'Hey'],
+          correctAnswer: 'Hello',
+          explanation: 'The audio clearly says "Hello".',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: 'How did the person introduce themselves?',
+          options: ["I'm...", 'My name is...', 'Call me...', 'This is...'],
+          correctAnswer: 'My name is...',
+          explanation: 'They said "My name is...".',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: "What is the speaker's age?",
+          options: ['13', '14', '15', '16'],
+          correctAnswer: '14',
+          explanation: 'The speaker mentions being 14 years old.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: 'What hobby does the speaker mention?',
+          options: ['Reading', 'Swimming', 'Drawing', 'Singing'],
+          correctAnswer: 'Reading',
+          explanation: 'The speaker says they enjoy reading.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText: 'What tone does the speaker use?',
+          options: ['Formal', 'Casual', 'Nervous', 'Excited'],
+          correctAnswer: 'Casual',
+          explanation: 'The speaker uses a friendly, casual tone.',
+        },
+      ],
+    },
+    {
+      category: subCategories[2], // 일상생활 > 독해
+      passage: `My Daily Routine\n\nI wake up at 7:00 every morning. I have toast and orange juice for breakfast. School starts at 8:30, so I take the bus at 8:00. After school, I have soccer practice for two hours. I get home around 6:00 PM, have dinner with my family, and do my homework. I usually go to bed at 10:30 PM.`,
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: 'What time does school start?',
+          options: ['8:00', '8:30', '9:00', '9:30'],
+          correctAnswer: '8:30',
+          explanation: 'The text states school starts at 8:30.',
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: 'What does the person eat for breakfast?',
+          options: ['Toast', 'Cereal', 'Rice', 'Eggs'],
+          correctAnswer: 'Toast',
+          explanation: 'The passage mentions eating toast.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: 'How does the person get to school?',
+          options: ['By bus', 'By subway', 'By bike', 'On foot'],
+          correctAnswer: 'By bus',
+          explanation: 'The text indicates they take the bus.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: 'What activity does the person do after school?',
+          options: [
+            'Soccer practice',
+            'Piano lesson',
+            'Study group',
+            'Part-time job',
+          ],
+          correctAnswer: 'Soccer practice',
+          explanation: 'The passage describes soccer practice after school.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText:
+            "What can be inferred about the person's daily routine?",
+          options: ['Very busy', 'Relaxed', 'Inconsistent', 'Unplanned'],
+          correctAnswer: 'Very busy',
+          explanation: 'The schedule described shows a busy daily routine.',
+        },
+      ],
+    },
+    {
+      category: subCategories[3], // 일상생활 > 듣기
+      questions: [
+        {
+          difficulty: 'LEVEL_1',
+          questionText: 'What day is it?',
+          options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+          correctAnswer: 'Monday',
+          explanation: "The speaker mentions it's Monday.",
+        },
+        {
+          difficulty: 'LEVEL_2',
+          questionText: 'What subject does the person have first?',
+          options: ['Math', 'English', 'Science', 'History'],
+          correctAnswer: 'Math',
+          explanation: 'The audio indicates Math is the first class.',
+        },
+        {
+          difficulty: 'LEVEL_3',
+          questionText: 'Where does the person have lunch?',
+          options: ['Cafeteria', 'Classroom', 'Home', 'Restaurant'],
+          correctAnswer: 'Cafeteria',
+          explanation: 'The speaker says they eat in the cafeteria.',
+        },
+        {
+          difficulty: 'LEVEL_4',
+          questionText: 'What does the person plan to do this weekend?',
+          options: ['Study', 'Visit family', 'Go shopping', 'Watch a movie'],
+          correctAnswer: 'Watch a movie',
+          explanation: 'They mention plans to watch a movie.',
+        },
+        {
+          difficulty: 'LEVEL_5',
+          questionText:
+            'What emotion does the speaker convey about their routine?',
+          options: ['Satisfaction', 'Boredom', 'Stress', 'Excitement'],
+          correctAnswer: 'Satisfaction',
+          explanation:
+            "The speaker's tone suggests satisfaction with their routine.",
+        },
+      ],
+    },
   ];
 
-  const chapters = await db
-    .insert(schema.englishChapters)
-    .values(chaptersData)
-    .returning();
-
-  console.log('✅ English Chapters created:', chapters.length);
-
-  // 3. English Problems 생성 (각 단원당 레벨별 3문제씩 = 총 315문제)
-  const problemsData: any[] = [];
-  const difficulties: Array<
-    'LEVEL_1' | 'LEVEL_2' | 'LEVEL_3' | 'LEVEL_4' | 'LEVEL_5'
-  > = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4', 'LEVEL_5'];
-
-  for (const chapter of chapters) {
-    for (const difficulty of difficulties) {
-      for (let problemNum = 1; problemNum <= 3; problemNum++) {
-        problemsData.push({
-          chapterId: chapter.id,
-          questionType: 'MULTIPLE_CHOICE' as const,
-          difficulty: difficulty,
-          questionText: `${chapter.name} - ${difficulty} 문제 ${problemNum}`,
-          option1: 'Option 1',
-          option2: 'Option 2',
-          option3: 'Option 3',
-          option4: 'Option 4',
-          correctAnswer: 'Option 1',
-          explanation: `${chapter.name}의 ${difficulty} 난이도 문제 ${problemNum} 풀이`,
-          tags: `${chapter.name},중학영어`,
-          isActive: true,
-        });
-      }
-    }
-  }
-
-  const problems = await db
-    .insert(schema.englishProblems)
-    .values(problemsData)
-    .returning();
-
-  console.log('✅ English Problems created:', problems.length);
-
-  // 4. English Test Sets 생성 (각 학년당 1개씩 = 총 3개)
-  const testSetsData = [
-    {
-      title: '중1 영어 종합 평가',
-      description: '중학교 1학년 전체 단원 종합 평가',
-      gradeLevel: 1,
-      testType: 'MIDTERM' as const,
-      totalQuestions: 10,
-      timeLimit: 30,
-      isActive: true,
-    },
-    {
-      title: '중2 영어 모의고사',
-      description: '중학교 2학년 모의고사',
-      gradeLevel: 2,
-      testType: 'MOCK' as const,
-      totalQuestions: 15,
-      timeLimit: 40,
-      isActive: true,
-    },
-    {
-      title: '중3 영어 실전 테스트',
-      description: '중학교 3학년 실전 대비 테스트',
-      gradeLevel: 3,
-      testType: 'FINAL' as const,
-      totalQuestions: 20,
-      timeLimit: 50,
-      isActive: true,
-    },
-  ];
-
-  const testSets = await db
-    .insert(schema.englishTestSets)
-    .values(testSetsData)
-    .returning();
-
-  console.log('✅ English Test Sets created:', testSets.length);
-
-  // 5. English Test Set Problems 연결 (각 시험지에 문제 추가)
-  const testSetProblemsData: any[] = [];
-
-  for (let i = 0; i < testSets.length; i++) {
-    const testSet = testSets[i];
-    const gradeLevel = i + 1;
-
-    // 해당 학년의 문제들만 필터링
-    const gradeProblems = problems.filter((p) => {
-      const chapter = chapters.find((c) => c.id === p.chapterId);
-      return chapter?.gradeLevel === gradeLevel;
-    });
-
-    // 각 시험지의 totalQuestions만큼 문제 추가
-    const selectedProblems = gradeProblems.slice(0, testSet.totalQuestions);
-
-    selectedProblems.forEach((problem, index) => {
-      testSetProblemsData.push({
-        testSetId: testSet.id,
-        problemId: problem.id,
+  questionSets.forEach((set) => {
+    set.questions.forEach((q, index) => {
+      questionsData.push({
+        categoryId: set.category.id,
+        creatorType: 'SYSTEM' as const,
+        passage: set.passage || null, // 독해 지문 추가
+        questionText: q.questionText,
+        options: JSON.stringify(q.options),
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        difficulty: q.difficulty,
+        tags: `${set.category.name},영어`,
+        isActive: true,
         orderIndex: index + 1,
-        score: 5,
       });
     });
-  }
+  });
 
-  await db
-    .insert(schema.englishTestSetProblems)
-    .values(testSetProblemsData)
+  const questions = await db
+    .insert(schema.questions)
+    .values(questionsData)
     .returning();
 
-  console.log(
-    '✅ English Test Set Problems linked:',
-    testSetProblemsData.length,
-  );
+  console.log('✅ Questions created:', questions.length);
 
   await pool.end();
   console.log('🎉 English seed completed!');
+  console.log('📊 Summary:');
+  console.log('  - 2 top categories: 인사와 소개, 일상생활');
+  console.log('  - 4 sub categories: 각 단원별 독해/듣기');
+  console.log('  - 20 questions: 각 카테고리별 5문제');
 }
 
 seedEnglish().catch((error) => {
