@@ -11,7 +11,13 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // Enums
-export const difficultyEnum = pgEnum('difficulty', ['EASY', 'MEDIUM', 'HARD']);
+export const difficultyEnum = pgEnum('difficulty', [
+  'LEVEL_1',
+  'LEVEL_2',
+  'LEVEL_3',
+  'LEVEL_4',
+  'LEVEL_5',
+]);
 export const questionTypeEnum = pgEnum('question_type', [
   'MULTIPLE_CHOICE',
   'TRUE_FALSE',
