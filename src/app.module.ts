@@ -19,7 +19,7 @@ import { SharedTestResultsController } from './shared-test-results.controller';
 import { ExamHallBookmarksModule } from './exam-hall-bookmarks.module';
 import { CategoriesModule } from './categories/categories.module';
 import { QuestionsModule } from './questions/questions.module';
-import { ChatScriptsModule } from './chat-scripts/chat-scripts.module';
+// import { ChatScriptsModule } from './chat-scripts/chat-scripts.module'; // Deprecated: chatScripts merged into questions
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ import { ChatScriptsModule } from './chat-scripts/chat-scripts.module';
     ExamHallBookmarksModule,
     CategoriesModule,
     QuestionsModule,
-    ChatScriptsModule,
+    // ChatScriptsModule, // Deprecated: merged into questions
   ],
   controllers: [AppController, SharedTestResultsController],
   providers: [AppService, SharedTestResultsService],

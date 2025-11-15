@@ -137,117 +137,117 @@ Tom said it was the best vacation he ever had.`,
 
     console.log('✅ Reading questions created\n');
 
-//     // 7. 듣기 문제 추가 (scriptData 사용)
-//     console.log('🎧 Creating listening questions with scripts...');
-//     await db.insert(schema.questions).values([
-//       {
-//         categoryId: listeningCategory.id,
-//         creatorType: 'SYSTEM',
-//         title: '카페에서 커피 주문하기',
-//         description: '카페에서 음료를 주문하는 상황 대화',
-//         subject: 'ENGLISH',
-//         creatorType: 'SYSTEM',
-//         displayOrder: 1,
-//         scriptData: {
-//           situation: '카페에서 손님이 커피를 주문하는 상황',
-//           roles: ['Customer', 'Barista'],
-//           messages: [
-//             {
-//               role: 'LEFT_CHARACTER',
-//               message: "Hi, I'd like to order a tall latte, please.",
-//             },
-//             {
-//               role: 'RIGHT_CHARACTER',
-//               message: 'Sure! Would you like that hot or iced?',
-//             },
-//             {
-//               role: 'LEFT_CHARACTER',
-//               message: 'Hot, please. And can I get an extra shot of espresso?',
-//             },
-//             {
-//               role: 'RIGHT_CHARACTER',
-//               message: "Of course. That'll be $5.50.",
-//             },
-//           ],
-//         },
-//       })
-//       .returning();
-//     const chatScript1 = chatScript1Result[0];
-// 
-//     const chatScript2Result = await db
-//       .insert(schema.chatScripts)
-//       .values({
-//         title: '길 안내하기',
-//         description: '관광객에게 길을 안내하는 대화',
-//         subject: 'ENGLISH',
-//         creatorType: 'SYSTEM',
-//         displayOrder: 2,
-//         scriptData: {
-//           situation: '거리에서 관광객이 길을 묻는 상황',
-//           roles: ['Tourist', 'Local'],
-//           messages: [
-//             {
-//               role: 'LEFT_CHARACTER',
-//               message: 'Excuse me, how can I get to the subway station?',
-//             },
-//             {
-//               role: 'RIGHT_CHARACTER',
-//               message: 'Go straight for two blocks, then turn left.',
-//             },
-//             { role: 'LEFT_CHARACTER', message: 'Is it far from here?' },
-//             {
-//               role: 'RIGHT_CHARACTER',
-//               message: "No, it's about a 5-minute walk.",
-//             },
-//             { role: 'LEFT_CHARACTER', message: 'Thank you so much!' },
-//           ],
-//         },
-//       })
-//       .returning();
-//     const chatScript2 = chatScript2Result[0];
-// 
-//     console.log('✅ Chat scripts created\n');
-// 
-//     // 8. 듣기 문제 추가 (채팅 스크립트 참조)
-//     console.log('🎧 Creating listening questions...');
-//     await db.insert(schema.questions).values([
-//       {
-//         categoryId: listeningCategory.id,
-//         chatScriptId: chatScript1.id,
-//         creatorType: 'SYSTEM',
-//         title: '카페 주문',
-//         questionText: 'What size coffee did the customer order?',
-//         options: ['Tall', 'Grande', 'Venti', 'Short'],
-//         correctAnswer: 'Tall',
-//         explanation: 'Customer가 "a tall latte"를 주문했습니다.',
-//         difficulty: 'LEVEL_2',
-//         tags: '듣기, 일상대화, 카페',
-//         isActive: true,
-//         orderIndex: 1,
-//       },
-//       {
-//         categoryId: listeningCategory.id,
-//         chatScriptId: chatScript2.id,
-//         creatorType: 'SYSTEM',
-//         title: '길 안내',
-//         questionText: 'How long does it take to walk to the subway station?',
-//         options: [
-//           'About 2 minutes',
-//           'About 5 minutes',
-//           'About 10 minutes',
-//           'About 15 minutes',
-//         ],
-//         correctAnswer: 'About 5 minutes',
-//         explanation: 'Local이 "it\'s about a 5-minute walk"라고 답했습니다.',
-//         difficulty: 'LEVEL_2',
-//         tags: '듣기, 길 안내, 교통',
-//         isActive: true,
-//         orderIndex: 2,
-//       },
-//     ]);
-// 
-//     console.log('✅ Listening questions created\n');
-// 
+    // 7. 듣기 문제 추가 (scriptData 사용)
+    console.log('🎧 Creating listening questions with scripts...');
+    await db.insert(schema.questions).values([
+      {
+        categoryId: listeningCategory.id,
+        creatorType: 'SYSTEM',
+        title: '카페에서 커피 주문하기',
+        description: '카페에서 음료를 주문하는 상황 대화',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        displayOrder: 1,
+        scriptData: {
+          situation: '카페에서 손님이 커피를 주문하는 상황',
+          roles: ['Customer', 'Barista'],
+          messages: [
+            {
+              role: 'LEFT_CHARACTER',
+              message: "Hi, I'd like to order a tall latte, please.",
+            },
+            {
+              role: 'RIGHT_CHARACTER',
+              message: 'Sure! Would you like that hot or iced?',
+            },
+            {
+              role: 'LEFT_CHARACTER',
+              message: 'Hot, please. And can I get an extra shot of espresso?',
+            },
+            {
+              role: 'RIGHT_CHARACTER',
+              message: "Of course. That'll be $5.50.",
+            },
+          ],
+        },
+      })
+      .returning();
+    const chatScript1 = chatScript1Result[0];
+
+    const chatScript2Result = await db
+      .insert(schema.chatScripts)
+      .values({
+        title: '길 안내하기',
+        description: '관광객에게 길을 안내하는 대화',
+        subject: 'ENGLISH',
+        creatorType: 'SYSTEM',
+        displayOrder: 2,
+        scriptData: {
+          situation: '거리에서 관광객이 길을 묻는 상황',
+          roles: ['Tourist', 'Local'],
+          messages: [
+            {
+              role: 'LEFT_CHARACTER',
+              message: 'Excuse me, how can I get to the subway station?',
+            },
+            {
+              role: 'RIGHT_CHARACTER',
+              message: 'Go straight for two blocks, then turn left.',
+            },
+            { role: 'LEFT_CHARACTER', message: 'Is it far from here?' },
+            {
+              role: 'RIGHT_CHARACTER',
+              message: "No, it's about a 5-minute walk.",
+            },
+            { role: 'LEFT_CHARACTER', message: 'Thank you so much!' },
+          ],
+        },
+      })
+      .returning();
+    const chatScript2 = chatScript2Result[0];
+
+    console.log('✅ Chat scripts created\n');
+
+    // 8. 듣기 문제 추가 (채팅 스크립트 참조)
+    console.log('🎧 Creating listening questions...');
+    await db.insert(schema.questions).values([
+      {
+        categoryId: listeningCategory.id,
+        chatScriptId: chatScript1.id,
+        creatorType: 'SYSTEM',
+        title: '카페 주문',
+        questionText: 'What size coffee did the customer order?',
+        options: ['Tall', 'Grande', 'Venti', 'Short'],
+        correctAnswer: 'Tall',
+        explanation: 'Customer가 "a tall latte"를 주문했습니다.',
+        difficulty: 'LEVEL_2',
+        tags: '듣기, 일상대화, 카페',
+        isActive: true,
+        orderIndex: 1,
+      },
+      {
+        categoryId: listeningCategory.id,
+        chatScriptId: chatScript2.id,
+        creatorType: 'SYSTEM',
+        title: '길 안내',
+        questionText: 'How long does it take to walk to the subway station?',
+        options: [
+          'About 2 minutes',
+          'About 5 minutes',
+          'About 10 minutes',
+          'About 15 minutes',
+        ],
+        correctAnswer: 'About 5 minutes',
+        explanation: 'Local이 "it\'s about a 5-minute walk"라고 답했습니다.',
+        difficulty: 'LEVEL_2',
+        tags: '듣기, 길 안내, 교통',
+        isActive: true,
+        orderIndex: 2,
+      },
+    ]);
+
+    console.log('✅ Listening questions created\n');
+
     // 8. 수학 루트 카테고리 생성
     console.log('🔢 Creating Math categories...');
     const mathRootResult = await db

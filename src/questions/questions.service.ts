@@ -64,6 +64,7 @@ export class QuestionsService {
         creatorId: dto.creatorId || null,
         title: dto.title || null,
         passage: dto.passage || null,
+        scriptData: dto.scriptData || null,
         questionText: dto.questionText,
         options: dto.options || null,
         correctAnswer: dto.correctAnswer,

@@ -54,45 +54,35 @@ export const categories = pgTable('categories', {
 });
 
 /**
- * Chat Scripts (채팅 스크립트)
- *
- * 독립적인 채팅 대화 데이터
- * 여러 문제에서 재사용 가능
- */
-export const chatScripts = pgTable('chat_scripts', {
-  id: serial('id').primaryKey(),
-  title: varchar('title', { length: 200 }).notNull(),
-  description: text('description'),
-  scriptData: jsonb('script_data').notNull(), // 채팅 대화 JSON
-  subject: subjectEnum('subject').notNull(), // ENGLISH | MATH
-  creatorType: creatorTypeEnum('creator_type').notNull().default('SYSTEM'),
-  creatorId: bigint('creator_id', { mode: 'number' }),
-  displayOrder: integer('display_order').default(0).notNull(), // 정렬 순서
-  viewCount: integer('view_count').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
-
-/**
  * Questions (문제)
  *
  * 모든 문제는 하나의 카테고리에 소속됨
  * 영어, 수학 구분 없이 단일 테이블 사용
+ *
+ * scriptData 구조 예시:
+ * {
+ *   "characters": [
+ *     {"role": "Brandon", "avatar": "male1", "gender": "male"},
+ *     {"role": "Katie", "avatar": "female1", "gender": "female"}
+ *   ],
+ *   "dialogues": [
+ *     {"speaker": "Brandon", "text": "Hello, how are you?"},
+ *     {"speaker": "Katie", "text": "I'm fine, thanks!"}
+ *   ]
+ * }
  */
 export const questions = pgTable('questions', {
   id: serial('id').primaryKey(),
   categoryId: integer('category_id')
     .references(() => categories.id, { onDelete: 'cascade' })
     .notNull(),
-  chatScriptId: integer('chat_script_id').references(() => chatScripts.id, {
-    onDelete: 'set null',
-  }), // 채팅 스크립트 참조 (선택)
   creatorType: creatorTypeEnum('creator_type').notNull().default('SYSTEM'),
   creatorId: bigint('creator_id', { mode: 'number' }), // USER일 경우 Spring Boot 유저 ID
 
   // 문제 내용
   title: varchar('title', { length: 300 }), // 문제 제목 (선택)
   passage: text('passage'), // 독해 지문 (영어 독해에만 사용)
+  scriptData: jsonb('script_data'), // 채팅 스크립트 JSON (대화형 문제용)
   questionText: text('question_text').notNull(), // 문제 본문
 
   // 선택지 (객관식)

@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsBoolean,
   IsArray,
+  IsObject,
   Min,
 } from 'class-validator';
 
@@ -41,6 +42,20 @@ export class CreateQuestionDto {
   @IsString()
   @IsOptional()
   passage?: string; // 독해 지문
+
+  @IsObject()
+  @IsOptional()
+  scriptData?: {
+    characters: Array<{
+      role: string;
+      avatar: string;
+      gender: 'male' | 'female';
+    }>;
+    dialogues: Array<{
+      speaker: string;
+      text: string;
+    }>;
+  }; // 채팅 스크립트 JSON
 
   @IsString()
   questionText: string;
@@ -95,6 +110,20 @@ export class UpdateQuestionDto {
   @IsOptional()
   passage?: string;
 
+  @IsObject()
+  @IsOptional()
+  scriptData?: {
+    characters: Array<{
+      role: string;
+      avatar: string;
+      gender: 'male' | 'female';
+    }>;
+    dialogues: Array<{
+      speaker: string;
+      text: string;
+    }>;
+  };
+
   @IsString()
   @IsOptional()
   questionText?: string;
@@ -144,6 +173,17 @@ export class QuestionResponseDto {
   creatorId: number | null;
   title: string | null;
   passage: string | null;
+  scriptData: {
+    characters: Array<{
+      role: string;
+      avatar: string;
+      gender: 'male' | 'female';
+    }>;
+    dialogues: Array<{
+      speaker: string;
+      text: string;
+    }>;
+  } | null;
   questionText: string;
   options: string[] | null;
   correctAnswer: string;
