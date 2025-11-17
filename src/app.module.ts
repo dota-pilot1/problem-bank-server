@@ -20,6 +20,7 @@ import { ExamHallBookmarksModule } from './exam-hall-bookmarks.module';
 import { CategoriesModule } from './categories/categories.module';
 import { QuestionsModule } from './questions/questions.module';
 // import { ChatScriptsModule } from './chat-scripts/chat-scripts.module'; // Deprecated: chatScripts merged into questions
+import { YoutubeModule } from './youtube/youtube.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { QuestionsModule } from './questions/questions.module';
     ExamHallBookmarksModule,
     CategoriesModule,
     QuestionsModule,
+    YoutubeModule,
     // ChatScriptsModule, // Deprecated: merged into questions
   ],
   controllers: [AppController, SharedTestResultsController],

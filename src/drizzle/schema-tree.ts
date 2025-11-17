@@ -73,9 +73,9 @@ export const categories = pgTable('categories', {
  */
 export const questions = pgTable('questions', {
   id: serial('id').primaryKey(),
-  categoryId: integer('category_id')
-    .references(() => categories.id, { onDelete: 'cascade' })
-    .notNull(),
+  categoryId: integer('category_id').references(() => categories.id, {
+    onDelete: 'cascade',
+  }),
   creatorType: creatorTypeEnum('creator_type').notNull().default('SYSTEM'),
   creatorId: bigint('creator_id', { mode: 'number' }), // USER일 경우 Spring Boot 유저 ID
 

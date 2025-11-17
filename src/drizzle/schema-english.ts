@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   pgEnum,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 // Enums (영어 전용)
@@ -49,19 +50,26 @@ export const englishChapters = pgTable('english_chapters', {
 // 2. English Problems (영어 문제)
 export const englishProblems = pgTable('english_problems', {
   id: serial('id').primaryKey(),
-  chapterId: integer('chapter_id')
-    .references(() => englishChapters.id)
-    .notNull(),
+  chapterId: integer('chapter_id').references(() => englishChapters.id),
   questionType: questionTypeEnum('question_type').notNull(),
   difficulty: difficultyEnum('difficulty').notNull(),
+
+  // 문제 내용
+  title: varchar('title', { length: 300 }), // 문제 제목 (선택)
+  passage: text('passage'), // 독해 지문 (선택)
+  scriptData: jsonb('script_data'), // 채팅 스크립트 JSON (대화형 문제용)
   questionText: text('question_text').notNull(),
   listeningText: text('listening_text'), // 듣기 문제용 TTS 텍스트 (선택)
   questionImageUrl: varchar('question_image_url', { length: 500 }), // 문제 이미지 URL (S3)
+
+  // 선택지
   option1: varchar('option1', { length: 500 }),
   option2: varchar('option2', { length: 500 }),
   option3: varchar('option3', { length: 500 }),
   option4: varchar('option4', { length: 500 }),
   correctAnswer: varchar('correct_answer', { length: 500 }).notNull(),
+
+  // 추가 정보
   explanation: text('explanation'),
   tags: text('tags'),
   isActive: boolean('is_active').default(true).notNull(),
