@@ -28,6 +28,8 @@
     "db:seed:listening": "ts-node -r tsconfig-paths/register scripts/seed-listening.ts",
     "db:seed:math:real": "ts-node -r tsconfig-paths/register scripts/seed-math-real.ts",
     "db:seed:english:real": "ts-node -r tsconfig-paths/register scripts/seed-english-real.ts",
+    "db:drop": "node scripts/drop-db.js",
+    "db:recreate": "node scripts/drop-db.js && npm run db:push && npm run db:reset:all",
     "db:reset": "node scripts/reset-db.js && npm run db:seed",
     "db:reset:all": "node scripts/reset-db.js && npm run db:seed:math && npm run db:seed:english",
     "db:reset:real": "node scripts/reset-db.js && npm run db:seed:math:real && npm run db:seed:english:real && npm run db:seed:listening"
