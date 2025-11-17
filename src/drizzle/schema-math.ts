@@ -43,25 +43,31 @@ export const mathChapters = pgTable('math_chapters', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// 2. Math Problems (수학 문제)
+// 2. Math Problems (수학 문제) - questions 테이블과 동일한 구조
 export const mathProblems = pgTable('math_problems', {
   id: serial('id').primaryKey(),
-  chapterId: integer('chapter_id')
-    .references(() => mathChapters.id)
-    .notNull(),
-  questionType: questionTypeEnum('question_type').notNull(),
-  difficulty: difficultyEnum('difficulty').notNull(),
-  questionText: text('question_text').notNull(),
-  listeningText: text('listening_text'), // 듣기 문제용 TTS 텍스트 (선택)
-  questionImageUrl: varchar('question_image_url', { length: 500 }), // 문제 이미지 URL (S3)
-  option1: varchar('option1', { length: 500 }),
-  option2: varchar('option2', { length: 500 }),
-  option3: varchar('option3', { length: 500 }),
-  option4: varchar('option4', { length: 500 }),
-  correctAnswer: varchar('correct_answer', { length: 500 }).notNull(),
-  explanation: text('explanation'),
-  tags: text('tags'),
+
+  // 문제 내용
+  title: varchar('title', { length: 300 }), // 문제 제목 (선택)
+  passage: text('passage'), // 독해 지문 (영어 독해에만 사용)
+  scriptData: jsonb('script_data'), // 채팅 스크립트 JSON (대화형 문제용)
+  questionText: text('question_text').notNull(), // 문제 본문
+
+  // 선택지 (객관식)
+  options: jsonb('options'), // ["A", "B", "C", "D"] 형태
+  correctAnswer: varchar('correct_answer', { length: 500 }).notNull(), // 정답
+
+  // 추가 정보
+  explanation: text('explanation'), // 해설
+  difficulty: difficultyEnum('difficulty'), // 난이도
+  tags: text('tags'), // 태그 (콤마 구분)
+
+  // 수학 문제용
+  formula: text('formula'), // LaTeX 수식
+
+  // 메타 정보
   isActive: boolean('is_active').default(true).notNull(),
+  orderIndex: integer('order_index').notNull().default(0), // 시험지 내 정렬
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

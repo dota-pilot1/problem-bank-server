@@ -15,10 +15,7 @@ export class EnglishProblemsService {
   async create(createDto: CreateEnglishProblemDto) {
     const [problem] = await this.db
       .insert(schema.englishProblems)
-      .values({
-        ...createDto,
-        chapterId: createDto.chapterId ?? null,
-      })
+      .values(createDto)
       .returning();
     return problem;
   }
