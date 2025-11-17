@@ -70,24 +70,35 @@ export const chapters = pgTable('chapters', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// 3. Problems (문제)
+// 3. Problems (문제) - Questions 테이블
 export const problems = pgTable('problems', {
   id: serial('id').primaryKey(),
   subjectId: integer('subject_id')
     .references(() => subjects.id)
     .notNull(),
   chapterId: integer('chapter_id').references(() => chapters.id),
-  questionType: questionTypeEnum('question_type').notNull(),
-  difficulty: difficultyEnum('difficulty').notNull(),
-  questionText: text('question_text').notNull(),
-  option1: varchar('option1', { length: 500 }),
-  option2: varchar('option2', { length: 500 }),
-  option3: varchar('option3', { length: 500 }),
-  option4: varchar('option4', { length: 500 }),
-  correctAnswer: varchar('correct_answer', { length: 500 }).notNull(),
-  explanation: text('explanation'),
-  tags: text('tags'),
+
+  // 문제 내용
+  title: varchar('title', { length: 300 }), // 문제 제목 (선택)
+  passage: text('passage'), // 독해 지문
+  scriptData: jsonb('script_data'), // 채팅 스크립트 JSON
+  questionText: text('question_text').notNull(), // 문제 본문
+
+  // 선택지 (객관식)
+  options: jsonb('options'), // ["A", "B", "C", "D"] 형태
+  correctAnswer: varchar('correct_answer', { length: 500 }).notNull(), // 정답
+
+  // 추가 정보
+  explanation: text('explanation'), // 해설
+  difficulty: difficultyEnum('difficulty').notNull(), // 난이도
+  tags: text('tags'), // 태그
+
+  // 수학 문제용
+  formula: text('formula'), // LaTeX 수식
+
+  // 메타 정보
   isActive: boolean('is_active').default(true).notNull(),
+  orderIndex: integer('order_index').notNull().default(0), // 정렬 순서
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
