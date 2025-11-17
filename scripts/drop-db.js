@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Client } = require('pg');
 
 async function dropDatabase() {
@@ -12,7 +13,7 @@ async function dropDatabase() {
   try {
     await client.connect();
     console.log('🗑️  Dropping and recreating database...');
-    
+
     // Terminate all connections to the database
     await client.query(`
       SELECT pg_terminate_backend(pg_stat_activity.pid)
@@ -20,15 +21,15 @@ async function dropDatabase() {
       WHERE pg_stat_activity.datname = 'problem_bank'
       AND pid <> pg_backend_pid();
     `);
-    
+
     // Drop database
     await client.query('DROP DATABASE IF EXISTS problem_bank');
     console.log('✓ Database dropped');
-    
+
     // Create database
     await client.query('CREATE DATABASE problem_bank');
     console.log('✓ Database created');
-    
+
     console.log('✅ Database reset completed!');
   } catch (error) {
     console.error('❌ Error:', error.message);
