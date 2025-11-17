@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   pgEnum,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 // Enums (재사용)

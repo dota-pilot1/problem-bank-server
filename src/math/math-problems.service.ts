@@ -23,10 +23,6 @@ export class MathProblemsService {
   async findAll(chapterId?: number, difficulty?: string) {
     const conditions: SQL[] = [];
 
-    if (chapterId) {
-      conditions.push(eq(schema.mathProblems.chapterId, chapterId));
-    }
-
     if (difficulty) {
       conditions.push(eq(schema.mathProblems.difficulty, difficulty as any));
     }

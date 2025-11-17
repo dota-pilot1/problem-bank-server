@@ -25,10 +25,7 @@ export class SharedTestResultsService {
         score: englishSchema.englishTestSetProblems.score,
         questionText: englishSchema.englishProblems.questionText,
         correctAnswer: englishSchema.englishProblems.correctAnswer,
-        option1: englishSchema.englishProblems.option1,
-        option2: englishSchema.englishProblems.option2,
-        option3: englishSchema.englishProblems.option3,
-        option4: englishSchema.englishProblems.option4,
+        options: englishSchema.englishProblems.options,
       })
       .from(englishSchema.englishTestSetProblems)
       .innerJoin(
