@@ -15,7 +15,10 @@ export class MathProblemsService {
   async create(createDto: CreateMathProblemDto) {
     const [problem] = await this.db
       .insert(schema.mathProblems)
-      .values(createDto)
+      .values({
+        ...createDto,
+        chapterId: createDto.chapterId ?? null,
+      })
       .returning();
     return problem;
   }
