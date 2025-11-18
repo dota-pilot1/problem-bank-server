@@ -177,4 +177,31 @@ export class SharedTestResultsService {
       message: `${deleted.length}개의 결과가 삭제되었습니다.`,
     };
   }
+
+  async getSubmittedTestIds(
+    userId?: number,
+    guestId?: string,
+  ): Promise<number[]> {
+    let results;
+
+    if (userId) {
+      results = await this.db
+        .select({ testSetId: schema.sharedTestResults.testSetId })
+        .from(schema.sharedTestResults)
+        .where(eq(schema.sharedTestResults.userId, userId));
+    } else if (guestId) {
+      results = await this.db
+        .select({ testSetId: schema.sharedTestResults.testSetId })
+        .from(schema.sharedTestResults)
+        .where(eq(schema.sharedTestResults.guestId, guestId));
+    } else {
+      return [];
+    }
+
+    // 중복 제거
+    const testSetIds = [
+      ...new Set(results.map((r) => r.testSetId)),
+    ] as number[];
+    return testSetIds;
+  }
 }

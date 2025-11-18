@@ -83,6 +83,8 @@ export const mathTestSets = pgTable('math_test_sets', {
   totalQuestions: integer('total_questions').notNull().default(0),
   timeLimit: integer('time_limit'),
   isActive: boolean('is_active').default(true).notNull(),
+  isPublished: boolean('is_published').default(false).notNull(),
+  publishedAt: timestamp('published_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

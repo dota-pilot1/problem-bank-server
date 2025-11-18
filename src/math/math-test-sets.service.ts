@@ -148,6 +148,30 @@ export class MathTestSetsService {
     return { message: 'Problem removed successfully' };
   }
 
+  async publish(id: number) {
+    const [testSet] = await this.db
+      .update(schema.mathTestSets)
+      .set({
+        isPublished: true,
+        publishedAt: new Date(),
+      })
+      .where(eq(schema.mathTestSets.id, id))
+      .returning();
+    return testSet;
+  }
+
+  async unpublish(id: number) {
+    const [testSet] = await this.db
+      .update(schema.mathTestSets)
+      .set({
+        isPublished: false,
+        publishedAt: null,
+      })
+      .where(eq(schema.mathTestSets.id, id))
+      .returning();
+    return testSet;
+  }
+
   async createTestData() {
     const today = new Date();
     const month = today.getMonth() + 1;

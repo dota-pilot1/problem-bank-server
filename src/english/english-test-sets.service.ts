@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
 import * as schema from '../drizzle/schema-english';
+import * as mainSchema from '../drizzle/schema';
 import { DRIZZLE_ORM } from '../drizzle/drizzle.module';
 
 export interface CreateEnglishTestSetDto {
@@ -143,6 +144,36 @@ export class EnglishTestSetsService {
       .where(eq(schema.englishTestSets.id, testSetId));
 
     return { message: 'Problem removed successfully' };
+  }
+
+  async publish(id: number) {
+    const [testSet] = await this.db
+      .update(schema.englishTestSets)
+      .set({
+        isPublished: true,
+        publishedAt: new Date(),
+      })
+      .where(eq(schema.englishTestSets.id, id))
+      .returning();
+    return testSet;
+  }
+
+  async unpublish(id: number) {
+    // 1. 해당 시험의 결과 삭제
+    await this.db
+      .delete(mainSchema.sharedTestResults)
+      .where(eq(mainSchema.sharedTestResults.testSetId, id));
+
+    // 2. 배포 상태 취소
+    const [testSet] = await this.db
+      .update(schema.englishTestSets)
+      .set({
+        isPublished: false,
+        publishedAt: null,
+      })
+      .where(eq(schema.englishTestSets.id, id))
+      .returning();
+    return testSet;
   }
 
   async createTestData() {

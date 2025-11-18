@@ -91,4 +91,44 @@ export class TestSetsService {
     await this.db.delete(schema.testSets).where(eq(schema.testSets.id, id));
     return { deleted: true };
   }
+
+  async publish(id: number) {
+    const [testSet] = await this.db
+      .update(schema.testSets)
+      .set({
+        isPublished: true,
+        publishedAt: new Date(),
+      })
+      .where(eq(schema.testSets.id, id))
+      .returning();
+    return testSet;
+  }
+
+  async unpublish(id: number) {
+    const [testSet] = await this.db
+      .update(schema.testSets)
+      .set({
+        isPublished: false,
+        publishedAt: null,
+      })
+      .where(eq(schema.testSets.id, id))
+      .returning();
+    return testSet;
+  }
+
+  async findPublished(gradeId?: number) {
+    if (gradeId) {
+      return await this.db
+        .select()
+        .from(schema.testSets)
+        .where(
+          eq(schema.testSets.gradeId, gradeId) &&
+            eq(schema.testSets.isPublished, true),
+        );
+    }
+    return await this.db
+      .select()
+      .from(schema.testSets)
+      .where(eq(schema.testSets.isPublished, true));
+  }
 }

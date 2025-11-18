@@ -45,4 +45,15 @@ export class SharedTestResultsController {
   ): Promise<{ success: boolean; message: string }> {
     return this.sharedTestResultsService.resetRanking(testSetId);
   }
+
+  @Get('user/submitted')
+  async getSubmittedTestIds(
+    @Query('userId') userId?: string,
+    @Query('guestId') guestId?: string,
+  ): Promise<number[]> {
+    return this.sharedTestResultsService.getSubmittedTestIds(
+      userId ? parseInt(userId) : undefined,
+      guestId,
+    );
+  }
 }

@@ -155,6 +155,16 @@ export class EnglishController {
     );
   }
 
+  @Post('test-sets/:id/publish')
+  publishTestSet(@Param('id') id: string) {
+    return this.testSetsService.publish(+id);
+  }
+
+  @Post('test-sets/:id/unpublish')
+  unpublishTestSet(@Param('id') id: string) {
+    return this.testSetsService.unpublish(+id);
+  }
+
   // Test Sessions (시험장)
   @Post('test-sessions/start')
   startTest(@Request() req, @Body() body: { testSetId: number }) {

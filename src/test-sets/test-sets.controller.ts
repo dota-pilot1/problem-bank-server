@@ -61,4 +61,19 @@ export class TestSetsController {
   remove(@Param('id') id: string) {
     return this.testSetsService.remove(+id);
   }
+
+  @Post(':id/publish')
+  publish(@Param('id') id: string) {
+    return this.testSetsService.publish(+id);
+  }
+
+  @Post(':id/unpublish')
+  unpublish(@Param('id') id: string) {
+    return this.testSetsService.unpublish(+id);
+  }
+
+  @Get('published/list')
+  findPublished(@Query('gradeId') gradeId?: string) {
+    return this.testSetsService.findPublished(gradeId ? +gradeId : undefined);
+  }
 }
