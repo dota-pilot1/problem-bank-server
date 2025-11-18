@@ -90,6 +90,24 @@ export class MathController {
   }
 
   // Test Sets
+  @Post('test-sets')
+  createTestSet(
+    @Body()
+    dto: {
+      title: string;
+      description?: string;
+      gradeLevel: number;
+      testType: string;
+      timeLimit?: number;
+    },
+  ) {
+    return this.testSetsService.create({
+      ...dto,
+      testType: dto.testType as any,
+      totalQuestions: 0,
+    });
+  }
+
   @Get('test-sets')
   findAllTestSets(@Query('gradeLevel') gradeLevel?: string) {
     return this.testSetsService.findAll(gradeLevel ? +gradeLevel : undefined);
@@ -100,9 +118,51 @@ export class MathController {
     return this.testSetsService.findOne(+id);
   }
 
+  @Patch('test-sets/:id')
+  updateTestSet(
+    @Param('id') id: string,
+    @Body()
+    dto: Partial<{ title: string; description: string; isActive: boolean }>,
+  ) {
+    return this.testSetsService.update(+id, dto);
+  }
+
+  @Delete('test-sets/:id')
+  removeTestSet(@Param('id') id: string) {
+    return this.testSetsService.remove(+id);
+  }
+
+  @Post('test-sets/init/test-data')
+  createTestSetTestData() {
+    return this.testSetsService.createTestData();
+  }
+
   @Get('test-sets/:id/problems')
   getTestSetProblems(@Param('id') id: string) {
     return this.testSetsService.getTestSetProblems(+id);
+  }
+
+  @Post('test-sets/:testSetId/problems')
+  addProblemToTestSet(
+    @Param('testSetId') testSetId: string,
+    @Body() body: { problemId: number; score?: number },
+  ) {
+    return this.testSetsService.addProblemToTestSet(
+      +testSetId,
+      body.problemId,
+      body.score || 1,
+    );
+  }
+
+  @Delete('test-sets/:testSetId/problems/:problemId')
+  removeProblemFromTestSet(
+    @Param('testSetId') testSetId: string,
+    @Param('problemId') problemId: string,
+  ) {
+    return this.testSetsService.removeProblemFromTestSet(
+      +testSetId,
+      +problemId,
+    );
   }
 
   // Test Sessions (시험장)

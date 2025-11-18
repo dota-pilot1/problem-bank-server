@@ -90,4 +90,152 @@ export class MathTestSetsService {
       )
       .where(eq(schema.mathTestSetProblems.testSetId, testSetId));
   }
+
+  async addProblemToTestSet(
+    testSetId: number,
+    problemId: number,
+    score: number = 1,
+  ) {
+    const existingProblems = await this.db
+      .select()
+      .from(schema.mathTestSetProblems)
+      .where(eq(schema.mathTestSetProblems.testSetId, testSetId));
+
+    const orderIndex = existingProblems.length;
+
+    const [result] = await this.db
+      .insert(schema.mathTestSetProblems)
+      .values({
+        testSetId,
+        problemId,
+        orderIndex,
+        score,
+      })
+      .returning();
+
+    await this.db
+      .update(schema.mathTestSets)
+      .set({ totalQuestions: existingProblems.length + 1 })
+      .where(eq(schema.mathTestSets.id, testSetId));
+
+    return result;
+  }
+
+  async removeProblemFromTestSet(testSetId: number, problemId: number) {
+    await this.db
+      .delete(schema.mathTestSetProblems)
+      .where(
+        eq(schema.mathTestSetProblems.testSetId, testSetId) &&
+          eq(schema.mathTestSetProblems.problemId, problemId),
+      );
+
+    const remainingProblems = await this.db
+      .select()
+      .from(schema.mathTestSetProblems)
+      .where(eq(schema.mathTestSetProblems.testSetId, testSetId));
+
+    await this.db
+      .update(schema.mathTestSets)
+      .set({ totalQuestions: remainingProblems.length })
+      .where(eq(schema.mathTestSets.id, testSetId));
+
+    return { message: 'Problem removed successfully' };
+  }
+
+  async createTestData() {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const dateStr = `${month}월 ${day}일`;
+
+    // 1. 수학 문제 3개 생성
+    const [problem1] = await this.db
+      .insert(schema.mathProblems)
+      .values({
+        questionText: '다음 이차방정식의 해를 구하시오: x² - 5x + 6 = 0',
+        options: ['x = 1, 6', 'x = 2, 3', 'x = -2, -3', 'x = 1, 5'],
+        correctAnswer: '2',
+        explanation: 'x² - 5x + 6 = (x - 2)(x - 3) = 0 이므로 x = 2 또는 x = 3',
+        difficulty: 'LEVEL_2',
+        formula: 'x² - 5x + 6 = 0',
+        tags: 'algebra,quadratic',
+        isActive: true,
+        orderIndex: 0,
+      })
+      .returning();
+
+    const [problem2] = await this.db
+      .insert(schema.mathProblems)
+      .values({
+        questionText: '반지름이 5cm인 원의 넓이를 구하시오. (π = 3.14)',
+        options: ['31.4 cm²', '78.5 cm²', '157 cm²', '15.7 cm²'],
+        correctAnswer: '2',
+        explanation: '원의 넓이 = πr² = 3.14 × 5² = 3.14 × 25 = 78.5 cm²',
+        difficulty: 'LEVEL_1',
+        formula: 'S = πr²',
+        tags: 'geometry,circle',
+        isActive: true,
+        orderIndex: 1,
+      })
+      .returning();
+
+    const [problem3] = await this.db
+      .insert(schema.mathProblems)
+      .values({
+        questionText:
+          '직각삼각형에서 두 변의 길이가 3과 4일 때, 빗변의 길이는?',
+        options: ['5', '6', '7', '8'],
+        correctAnswer: '1',
+        explanation: '피타고라스 정리: c² = a² + b² = 9 + 16 = 25, c = 5',
+        difficulty: 'LEVEL_2',
+        formula: 'a² + b² = c²',
+        tags: 'geometry,pythagorean',
+        isActive: true,
+        orderIndex: 2,
+      })
+      .returning();
+
+    // 2. 시험지 생성
+    const [testSet] = await this.db
+      .insert(schema.mathTestSets)
+      .values({
+        title: `${dateStr} 수학 실력 평가`,
+        description: '수학 기초 실력을 평가하는 테스트입니다.',
+        gradeLevel: 1,
+        testType: 'MIDTERM',
+        totalQuestions: 3,
+        timeLimit: 30,
+        isActive: true,
+      })
+      .returning();
+
+    // 3. 시험지에 문제 추가
+    await this.db.insert(schema.mathTestSetProblems).values([
+      {
+        testSetId: testSet.id,
+        problemId: problem1.id,
+        orderIndex: 0,
+        score: 30,
+      },
+      {
+        testSetId: testSet.id,
+        problemId: problem2.id,
+        orderIndex: 1,
+        score: 40,
+      },
+      {
+        testSetId: testSet.id,
+        problemId: problem3.id,
+        orderIndex: 2,
+        score: 30,
+      },
+    ]);
+
+    return {
+      message: '수학 시험지 테스트 데이터가 생성되었습니다',
+      testSetId: testSet.id,
+      testSetTitle: testSet.title,
+      problemsCreated: 3,
+    };
+  }
 }

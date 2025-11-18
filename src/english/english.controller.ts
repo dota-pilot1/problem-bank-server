@@ -122,6 +122,11 @@ export class EnglishController {
     return this.testSetsService.remove(+id);
   }
 
+  @Post('test-sets/init/test-data')
+  createTestSetTestData() {
+    return this.testSetsService.createTestData();
+  }
+
   @Get('test-sets/:id/problems')
   getTestSetProblems(@Param('id') id: string) {
     return this.testSetsService.getTestSetProblems(+id);

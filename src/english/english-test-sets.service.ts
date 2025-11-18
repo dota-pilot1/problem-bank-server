@@ -144,4 +144,85 @@ export class EnglishTestSetsService {
 
     return { message: 'Problem removed successfully' };
   }
+
+  async createTestData() {
+    // 오늘 날짜 포맷
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const dateStr = `${month}월 ${day}일`;
+
+    // 1. 스크립트형 문제 생성
+    const [scriptProblem] = await this.db
+      .insert(schema.englishProblems)
+      .values({
+        title: '카페 주문 대화',
+        passage: null,
+        scriptData: {
+          characters: [
+            { role: 'Customer', avatar: '👤', gender: 'male' },
+            { role: 'Barista', avatar: '☕', gender: 'female' },
+          ],
+          dialogues: [
+            {
+              speaker: 'Customer',
+              text: 'Hi, can I get a large latte please?',
+            },
+            {
+              speaker: 'Barista',
+              text: 'Sure! Would you like that hot or iced?',
+            },
+            {
+              speaker: 'Customer',
+              text: 'Iced, please. And can I add an extra shot?',
+            },
+            { speaker: 'Barista', text: 'Of course! That will be $5.50.' },
+          ],
+        },
+        questionText: 'What did the customer order?',
+        options: [
+          'A small coffee',
+          'A large iced latte with an extra shot',
+          'A hot cappuccino',
+          'A medium tea',
+        ],
+        correctAnswer: '2',
+        explanation:
+          '고객이 large latte를 iced로 주문하고 extra shot을 추가했습니다.',
+        difficulty: 'LEVEL_1',
+        tags: 'listening,conversation',
+        isActive: true,
+        orderIndex: 0,
+      })
+      .returning();
+
+    // 2. 시험지 생성
+    const [testSet] = await this.db
+      .insert(schema.englishTestSets)
+      .values({
+        title: `${dateStr} 영어 듣기 평가`,
+        description: '영어 대화 듣기 능력을 평가하는 테스트입니다.',
+        gradeLevel: 1,
+        testType: 'DAILY',
+        totalQuestions: 1,
+        timeLimit: 30,
+        isActive: true,
+      })
+      .returning();
+
+    // 3. 시험지에 문제 추가
+    await this.db.insert(schema.englishTestSetProblems).values({
+      testSetId: testSet.id,
+      problemId: scriptProblem.id,
+      orderIndex: 0,
+      score: 100,
+    });
+
+    return {
+      message: '영어 시험지 테스트 데이터가 생성되었습니다',
+      testSetId: testSet.id,
+      testSetTitle: testSet.title,
+      problemsCreated: 1,
+    };
+  }
 }
