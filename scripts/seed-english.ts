@@ -122,42 +122,115 @@ async function seedEnglish() {
       ],
     },
     {
-      category: subCategories[1], // 인사와 소개 > 듣기
+      category: subCategories[1], // 인사와 소개 > 듣기 (스크립트형)
       questions: [
         {
           difficulty: 'LEVEL_1',
           questionText: 'What greeting did they use?',
-          options: ['Hello', 'Good morning', 'Hi there', 'Hey'],
+          options: ['Good morning', 'Hi there', 'Hello', 'Hey'],
           correctAnswer: 'Hello',
-          explanation: 'The audio clearly says "Hello".',
+          explanation: 'Sarah clearly says "Hello" at the beginning.',
+          scriptData: {
+            characters: [
+              { role: 'Sarah', avatar: 'Sarah', gender: 'female' as const },
+              { role: 'Brandon', avatar: 'Brandon', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Sarah', text: 'Hello! Nice to meet you.' },
+              { speaker: 'Brandon', text: 'Hi! Nice to meet you too.' },
+              { speaker: 'Sarah', text: "I'm Sarah. What's your name?" },
+              { speaker: 'Brandon', text: "I'm Brandon." },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_2',
-          questionText: 'How did the person introduce themselves?',
-          options: ["I'm...", 'My name is...', 'Call me...', 'This is...'],
-          correctAnswer: 'My name is...',
-          explanation: 'They said "My name is...".',
+          questionText: 'How did Sarah introduce herself?',
+          options: ['My name is...', "I'm...", 'Call me...', 'This is...'],
+          correctAnswer: "I'm...",
+          explanation: 'Sarah said "I\'m Sarah".',
+          scriptData: {
+            characters: [
+              { role: 'Sarah', avatar: 'Sarah', gender: 'female' as const },
+              { role: 'Brandon', avatar: 'Brandon', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Sarah', text: 'Hello! Nice to meet you.' },
+              { speaker: 'Brandon', text: 'Hi! Nice to meet you too.' },
+              { speaker: 'Sarah', text: "I'm Sarah. What's your name?" },
+              { speaker: 'Brandon', text: "I'm Brandon." },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_3',
-          questionText: "What is the speaker's age?",
-          options: ['13', '14', '15', '16'],
+          questionText: 'How old is Katie?',
+          options: ['13', '15', '16', '14'],
           correctAnswer: '14',
-          explanation: 'The speaker mentions being 14 years old.',
+          explanation: 'Katie mentions she is 14 years old.',
+          scriptData: {
+            characters: [
+              { role: 'Katie', avatar: 'Katie', gender: 'female' as const },
+              { role: 'Ronald', avatar: 'Ronald', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Ronald', text: 'Hi Katie! How old are you?' },
+              { speaker: 'Katie', text: "I'm 14 years old. How about you?" },
+              { speaker: 'Ronald', text: "I'm 15. We're almost the same age!" },
+              { speaker: 'Katie', text: 'Yes, we are!' },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_4',
-          questionText: 'What hobby does the speaker mention?',
-          options: ['Reading', 'Swimming', 'Drawing', 'Singing'],
+          questionText: 'What hobby does Elizabeth mention?',
+          options: ['Swimming', 'Reading', 'Drawing', 'Singing'],
           correctAnswer: 'Reading',
-          explanation: 'The speaker says they enjoy reading.',
+          explanation: 'Elizabeth says she loves reading books.',
+          scriptData: {
+            characters: [
+              {
+                role: 'Elizabeth',
+                avatar: 'Elizabeth',
+                gender: 'female' as const,
+              },
+              { role: 'Zack', avatar: 'Zack', gender: 'male' as const },
+            ],
+            dialogues: [
+              {
+                speaker: 'Zack',
+                text: 'What do you like to do in your free time?',
+              },
+              {
+                speaker: 'Elizabeth',
+                text: 'I love reading books. How about you?',
+              },
+              { speaker: 'Zack', text: 'I enjoy playing video games.' },
+              { speaker: 'Elizabeth', text: 'That sounds fun!' },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_5',
-          questionText: 'What tone does the speaker use?',
-          options: ['Formal', 'Casual', 'Nervous', 'Excited'],
-          correctAnswer: 'Casual',
-          explanation: 'The speaker uses a friendly, casual tone.',
+          questionText: 'What is the relationship between Sophie and Hugo?',
+          options: ['Siblings', 'Neighbors', 'Strangers', 'Classmates'],
+          correctAnswer: 'Classmates',
+          explanation: 'They mention being in the same class.',
+          scriptData: {
+            characters: [
+              { role: 'Sophie', avatar: 'Sophie', gender: 'female' as const },
+              { role: 'Hugo', avatar: 'Hugo', gender: 'male' as const },
+            ],
+            dialogues: [
+              {
+                speaker: 'Sophie',
+                text: "Hi! Are you in Mr. Kim's class too?",
+              },
+              { speaker: 'Hugo', text: 'Yes, I am! I sit in the back row.' },
+              { speaker: 'Sophie', text: "Nice to meet you! I'm Sophie." },
+              { speaker: 'Hugo', text: "I'm Hugo. Welcome to our class!" },
+            ],
+          },
         },
       ],
     },
@@ -209,55 +282,130 @@ async function seedEnglish() {
       ],
     },
     {
-      category: subCategories[3], // 일상생활 > 듣기
+      category: subCategories[3], // 일상생활 > 듣기 (스크립트형)
       questions: [
         {
           difficulty: 'LEVEL_1',
           questionText: 'What day is it?',
-          options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+          options: ['Tuesday', 'Monday', 'Wednesday', 'Thursday'],
           correctAnswer: 'Monday',
-          explanation: "The speaker mentions it's Monday.",
+          explanation: 'Kira says "Today is Monday".',
+          scriptData: {
+            characters: [
+              { role: 'Kira', avatar: 'Kira', gender: 'female' as const },
+              { role: 'Asher', avatar: 'Asher', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Kira', text: 'Good morning! Today is Monday.' },
+              { speaker: 'Asher', text: 'Yes, a new week begins!' },
+              { speaker: 'Kira', text: 'Are you ready for school?' },
+              { speaker: 'Asher', text: "Yes, let's go!" },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_2',
-          questionText: 'What subject does the person have first?',
-          options: ['Math', 'English', 'Science', 'History'],
+          questionText: 'What subject does Sierra have first?',
+          options: ['English', 'Science', 'Math', 'History'],
           correctAnswer: 'Math',
-          explanation: 'The audio indicates Math is the first class.',
+          explanation: 'Sierra mentions Math is her first class.',
+          scriptData: {
+            characters: [
+              { role: 'Sierra', avatar: 'Sierra', gender: 'female' as const },
+              { role: 'Clarence', avatar: 'Clarence', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Clarence', text: 'What class do you have first?' },
+              { speaker: 'Sierra', text: 'I have Math first. What about you?' },
+              { speaker: 'Clarence', text: 'I have English first.' },
+              { speaker: 'Sierra', text: 'See you at lunch then!' },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_3',
-          questionText: 'Where does the person have lunch?',
-          options: ['Cafeteria', 'Classroom', 'Home', 'Restaurant'],
+          questionText: 'Where do they have lunch?',
+          options: ['Classroom', 'Home', 'Restaurant', 'Cafeteria'],
           correctAnswer: 'Cafeteria',
-          explanation: 'The speaker says they eat in the cafeteria.',
+          explanation: 'They agree to meet at the cafeteria.',
+          scriptData: {
+            characters: [
+              { role: 'Katie', avatar: 'Katie', gender: 'female' as const },
+              { role: 'Brandon', avatar: 'Brandon', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Katie', text: 'Where should we have lunch?' },
+              { speaker: 'Brandon', text: "Let's go to the cafeteria." },
+              {
+                speaker: 'Katie',
+                text: 'Sounds good! I heard they have pizza today.',
+              },
+              { speaker: 'Brandon', text: 'Great! I love pizza!' },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_4',
-          questionText: 'What does the person plan to do this weekend?',
+          questionText: 'What does Sarah plan to do this weekend?',
           options: ['Study', 'Visit family', 'Go shopping', 'Watch a movie'],
           correctAnswer: 'Watch a movie',
-          explanation: 'They mention plans to watch a movie.',
+          explanation: 'Sarah mentions watching a new movie.',
+          scriptData: {
+            characters: [
+              { role: 'Sarah', avatar: 'Sarah', gender: 'female' as const },
+              { role: 'Ronald', avatar: 'Ronald', gender: 'male' as const },
+            ],
+            dialogues: [
+              { speaker: 'Ronald', text: 'Any plans for the weekend?' },
+              { speaker: 'Sarah', text: "I'm going to watch a new movie." },
+              { speaker: 'Ronald', text: 'Which one?' },
+              {
+                speaker: 'Sarah',
+                text: 'The new superhero movie. It looks exciting!',
+              },
+            ],
+          },
         },
         {
           difficulty: 'LEVEL_5',
-          questionText:
-            'What emotion does the speaker convey about their routine?',
-          options: ['Satisfaction', 'Boredom', 'Stress', 'Excitement'],
-          correctAnswer: 'Satisfaction',
-          explanation:
-            "The speaker's tone suggests satisfaction with their routine.",
+          questionText: 'How does Elizabeth feel about her daily routine?',
+          options: ['Bored', 'Satisfied', 'Stressed', 'Excited'],
+          correctAnswer: 'Satisfied',
+          explanation: 'Elizabeth expresses satisfaction with her routine.',
+          scriptData: {
+            characters: [
+              {
+                role: 'Elizabeth',
+                avatar: 'Elizabeth',
+                gender: 'female' as const,
+              },
+              { role: 'Hugo', avatar: 'Hugo', gender: 'male' as const },
+            ],
+            dialogues: [
+              {
+                speaker: 'Hugo',
+                text: 'How do you feel about your daily schedule?',
+              },
+              { speaker: 'Elizabeth', text: "I'm quite satisfied with it." },
+              { speaker: 'Hugo', text: "That's good! Balance is important." },
+              {
+                speaker: 'Elizabeth',
+                text: 'Yes, I have time for both study and hobbies.',
+              },
+            ],
+          },
         },
       ],
     },
   ];
 
   questionSets.forEach((set) => {
-    set.questions.forEach((q, index) => {
+    set.questions.forEach((q: any, index) => {
       questionsData.push({
         categoryId: set.category.id,
         creatorType: 'SYSTEM' as const,
         passage: set.passage || null, // 독해 지문 추가
+        scriptData: q.scriptData || null, // 스크립트 데이터 (jsonb이므로 객체 그대로)
         questionText: q.questionText,
         options: JSON.stringify(q.options),
         correctAnswer: q.correctAnswer,

@@ -69,6 +69,12 @@ export class MathTestSetsService {
   }
 
   async remove(id: number) {
+    // 먼저 연결된 문제들 삭제
+    await this.db
+      .delete(schema.mathTestSetProblems)
+      .where(eq(schema.mathTestSetProblems.testSetId, id));
+
+    // 시험지 삭제
     await this.db
       .delete(schema.mathTestSets)
       .where(eq(schema.mathTestSets.id, id));
@@ -148,13 +154,13 @@ export class MathTestSetsService {
     const day = today.getDate();
     const dateStr = `${month}월 ${day}일`;
 
-    // 1. 수학 문제 3개 생성
+    // 1. 수학 문제 4개 생성 (정답 분포: 1번, 2번, 3번, 4번)
     const [problem1] = await this.db
       .insert(schema.mathProblems)
       .values({
         questionText: '다음 이차방정식의 해를 구하시오: x² - 5x + 6 = 0',
-        options: ['x = 1, 6', 'x = 2, 3', 'x = -2, -3', 'x = 1, 5'],
-        correctAnswer: '2',
+        options: ['x = 2, 3', 'x = 1, 6', 'x = -2, -3', 'x = 1, 5'],
+        correctAnswer: '1',
         explanation: 'x² - 5x + 6 = (x - 2)(x - 3) = 0 이므로 x = 2 또는 x = 3',
         difficulty: 'LEVEL_2',
         formula: 'x² - 5x + 6 = 0',
@@ -184,14 +190,29 @@ export class MathTestSetsService {
       .values({
         questionText:
           '직각삼각형에서 두 변의 길이가 3과 4일 때, 빗변의 길이는?',
-        options: ['5', '6', '7', '8'],
-        correctAnswer: '1',
+        options: ['6', '7', '5', '8'],
+        correctAnswer: '3',
         explanation: '피타고라스 정리: c² = a² + b² = 9 + 16 = 25, c = 5',
         difficulty: 'LEVEL_2',
         formula: 'a² + b² = c²',
         tags: 'geometry,pythagorean',
         isActive: true,
         orderIndex: 2,
+      })
+      .returning();
+
+    const [problem4] = await this.db
+      .insert(schema.mathProblems)
+      .values({
+        questionText: '2x + 3 = 11일 때, x의 값은?',
+        options: ['2', '3', '5', '4'],
+        correctAnswer: '4',
+        explanation: '2x = 11 - 3 = 8, x = 4',
+        difficulty: 'LEVEL_1',
+        formula: '2x + 3 = 11',
+        tags: 'algebra,linear',
+        isActive: true,
+        orderIndex: 3,
       })
       .returning();
 
@@ -203,7 +224,7 @@ export class MathTestSetsService {
         description: '수학 기초 실력을 평가하는 테스트입니다.',
         gradeLevel: 1,
         testType: 'MIDTERM',
-        totalQuestions: 3,
+        totalQuestions: 4,
         timeLimit: 30,
         isActive: true,
       })
@@ -215,19 +236,25 @@ export class MathTestSetsService {
         testSetId: testSet.id,
         problemId: problem1.id,
         orderIndex: 0,
-        score: 30,
+        score: 25,
       },
       {
         testSetId: testSet.id,
         problemId: problem2.id,
         orderIndex: 1,
-        score: 40,
+        score: 25,
       },
       {
         testSetId: testSet.id,
         problemId: problem3.id,
         orderIndex: 2,
-        score: 30,
+        score: 25,
+      },
+      {
+        testSetId: testSet.id,
+        problemId: problem4.id,
+        orderIndex: 3,
+        score: 25,
       },
     ]);
 
@@ -235,7 +262,7 @@ export class MathTestSetsService {
       message: '수학 시험지 테스트 데이터가 생성되었습니다',
       testSetId: testSet.id,
       testSetTitle: testSet.title,
-      problemsCreated: 3,
+      problemsCreated: 4,
     };
   }
 }

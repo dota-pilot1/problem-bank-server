@@ -91,10 +91,10 @@ export const mathTestSets = pgTable('math_test_sets', {
 export const mathTestSetProblems = pgTable('math_test_set_problems', {
   id: serial('id').primaryKey(),
   testSetId: integer('test_set_id')
-    .references(() => mathTestSets.id)
+    .references(() => mathTestSets.id, { onDelete: 'cascade' })
     .notNull(),
   problemId: integer('problem_id')
-    .references(() => mathProblems.id)
+    .references(() => mathProblems.id, { onDelete: 'cascade' })
     .notNull(),
   orderIndex: integer('order_index').notNull(),
   score: integer('score').default(1).notNull(),
