@@ -163,7 +163,21 @@ export const sharedTestResults = pgTable('shared_test_results', {
   completedAt: timestamp('completed_at').defaultNow().notNull(),
 });
 
-// 8. Exam Hall Bookmarks (시험장 북마크)
+// 8. Shared Math Test Results (수학 공유 시험 결과)
+export const sharedMathTestResults = pgTable('shared_math_test_results', {
+  id: serial('id').primaryKey(),
+  testSetId: integer('test_set_id').notNull(),
+  userId: integer('user_id'),
+  guestId: varchar('guest_id', { length: 36 }),
+  userName: varchar('user_name', { length: 100 }),
+  totalScore: integer('total_score').notNull(),
+  earnedScore: integer('earned_score').notNull(),
+  answers: jsonb('answers').notNull(),
+  timeSpentSeconds: integer('time_spent_seconds'),
+  completedAt: timestamp('completed_at').defaultNow().notNull(),
+});
+
+// 9. Exam Hall Bookmarks (시험장 북마크)
 export const examHallBookmarks = pgTable(
   'exam_hall_bookmarks',
   {

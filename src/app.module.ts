@@ -16,6 +16,8 @@ import { ListeningQuestionsModule } from './listening-questions/listening-questi
 import { SharedTestResultsModule } from './shared-test-results/shared-test-results.module';
 import { SharedTestResultsService } from './shared-test-results.service';
 import { SharedTestResultsController } from './shared-test-results.controller';
+import { SharedMathTestResultsService } from './shared-math-test-results.service';
+import { SharedMathTestResultsController } from './shared-math-test-results.controller';
 import { ExamHallBookmarksModule } from './exam-hall-bookmarks.module';
 import { CategoriesModule } from './categories/categories.module';
 import { QuestionsModule } from './questions/questions.module';
@@ -46,7 +48,15 @@ import { YoutubeModule } from './youtube/youtube.module';
     YoutubeModule,
     // ChatScriptsModule, // Deprecated: merged into questions
   ],
-  controllers: [AppController, SharedTestResultsController],
-  providers: [AppService, SharedTestResultsService],
+  controllers: [
+    AppController,
+    SharedTestResultsController,
+    SharedMathTestResultsController,
+  ],
+  providers: [
+    AppService,
+    SharedTestResultsService,
+    SharedMathTestResultsService,
+  ],
 })
 export class AppModule {}
