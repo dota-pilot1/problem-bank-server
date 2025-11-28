@@ -415,4 +415,82 @@ export class SharedMathTestResultsService {
 
     return null;
   }
+
+  async getWrongAnswersByResultId(
+    userId: number,
+    resultId: number,
+  ): Promise<{
+    testTitle: string;
+    completedAt: Date;
+    earnedScore: number;
+    totalScore: number;
+    wrongAnswers: Array<{
+      problemId: number;
+      questionText: string;
+      options: unknown;
+      correctAnswer: string;
+      selectedAnswer: string;
+      explanation: string | null;
+      formula: string | null;
+    }>;
+  } | null> {
+    const [result] = await this.db
+      .select()
+      .from(schema.sharedMathTestResults)
+      .where(eq(schema.sharedMathTestResults.id, resultId))
+      .limit(1);
+
+    if (!result || result.userId !== userId) {
+      return null;
+    }
+
+    const [testSet] = await this.db
+      .select({ title: mathSchema.mathTestSets.title })
+      .from(mathSchema.mathTestSets)
+      .where(eq(mathSchema.mathTestSets.id, result.testSetId))
+      .limit(1);
+
+    const answers = result.answers as Array<{
+      problemId: number;
+      selectedAnswer: string;
+    }>;
+
+    const wrongAnswers: Array<{
+      problemId: number;
+      questionText: string;
+      options: unknown;
+      correctAnswer: string;
+      selectedAnswer: string;
+      explanation: string | null;
+      formula: string | null;
+    }> = [];
+
+    for (const answer of answers) {
+      const [problem] = await this.db
+        .select()
+        .from(mathSchema.mathProblems)
+        .where(eq(mathSchema.mathProblems.id, answer.problemId))
+        .limit(1);
+
+      if (problem && answer.selectedAnswer !== problem.correctAnswer) {
+        wrongAnswers.push({
+          problemId: problem.id,
+          questionText: problem.questionText,
+          options: problem.options,
+          correctAnswer: problem.correctAnswer,
+          selectedAnswer: answer.selectedAnswer,
+          explanation: problem.explanation,
+          formula: problem.formula,
+        });
+      }
+    }
+
+    return {
+      testTitle: testSet?.title || `시험 #${result.testSetId}`,
+      completedAt: result.completedAt,
+      earnedScore: result.earnedScore,
+      totalScore: result.totalScore,
+      wrongAnswers,
+    };
+  }
 }

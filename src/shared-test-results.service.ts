@@ -413,4 +413,79 @@ export class SharedTestResultsService {
 
     return null;
   }
+
+  async getWrongAnswersByResultId(
+    userId: number,
+    resultId: number,
+  ): Promise<{
+    testTitle: string;
+    completedAt: Date;
+    earnedScore: number;
+    totalScore: number;
+    wrongAnswers: Array<{
+      problemId: number;
+      questionText: string;
+      options: unknown;
+      correctAnswer: string;
+      selectedAnswer: string;
+      explanation: string | null;
+    }>;
+  } | null> {
+    const [result] = await this.db
+      .select()
+      .from(schema.sharedTestResults)
+      .where(eq(schema.sharedTestResults.id, resultId))
+      .limit(1);
+
+    if (!result || result.userId !== userId) {
+      return null;
+    }
+
+    const [testSet] = await this.db
+      .select({ title: englishSchema.englishTestSets.title })
+      .from(englishSchema.englishTestSets)
+      .where(eq(englishSchema.englishTestSets.id, result.testSetId))
+      .limit(1);
+
+    const answers = result.answers as Array<{
+      problemId: number;
+      selectedAnswer: string;
+    }>;
+
+    const wrongAnswers: Array<{
+      problemId: number;
+      questionText: string;
+      options: unknown;
+      correctAnswer: string;
+      selectedAnswer: string;
+      explanation: string | null;
+    }> = [];
+
+    for (const answer of answers) {
+      const [problem] = await this.db
+        .select()
+        .from(englishSchema.englishProblems)
+        .where(eq(englishSchema.englishProblems.id, answer.problemId))
+        .limit(1);
+
+      if (problem && answer.selectedAnswer !== problem.correctAnswer) {
+        wrongAnswers.push({
+          problemId: problem.id,
+          questionText: problem.questionText,
+          options: problem.options,
+          correctAnswer: problem.correctAnswer,
+          selectedAnswer: answer.selectedAnswer,
+          explanation: problem.explanation,
+        });
+      }
+    }
+
+    return {
+      testTitle: testSet?.title || `시험 #${result.testSetId}`,
+      completedAt: result.completedAt,
+      earnedScore: result.earnedScore,
+      totalScore: result.totalScore,
+      wrongAnswers,
+    };
+  }
 }

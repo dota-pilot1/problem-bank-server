@@ -82,4 +82,15 @@ export class SharedTestResultsController {
       problemId,
     );
   }
+
+  @Get('results/:resultId/wrong-answers')
+  async getWrongAnswersByResultId(
+    @Param('resultId', ParseIntPipe) resultId: number,
+    @Query('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.sharedTestResultsService.getWrongAnswersByResultId(
+      userId,
+      resultId,
+    );
+  }
 }

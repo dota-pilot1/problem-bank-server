@@ -98,4 +98,18 @@ export class SharedMathTestResultsController {
       problemId,
     );
   }
+
+  @Get('results/:resultId/wrong-answers')
+  async getWrongAnswersByResultId(
+    @Param('resultId', ParseIntPipe) resultId: number,
+    @Query('userId') userId: string,
+  ) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getWrongAnswersByResultId(
+      parseInt(userId),
+      resultId,
+    );
+  }
 }
