@@ -56,4 +56,30 @@ export class SharedTestResultsController {
       guestId,
     );
   }
+
+  @Get('report/summary')
+  async getScoreReportSummary(@Query('userId', ParseIntPipe) userId: number) {
+    return this.sharedTestResultsService.getScoreReportSummary(userId);
+  }
+
+  @Get('report/history')
+  async getScoreReportHistory(@Query('userId', ParseIntPipe) userId: number) {
+    return this.sharedTestResultsService.getScoreReportHistory(userId);
+  }
+
+  @Get('wrong-answers')
+  async getWrongAnswers(@Query('userId', ParseIntPipe) userId: number) {
+    return this.sharedTestResultsService.getWrongAnswers(userId);
+  }
+
+  @Get('wrong-answers/:problemId')
+  async getWrongAnswerDetail(
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Query('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.sharedTestResultsService.getWrongAnswerDetail(
+      userId,
+      problemId,
+    );
+  }
 }

@@ -56,4 +56,46 @@ export class SharedMathTestResultsController {
       guestId,
     );
   }
+
+  @Get('report/summary')
+  async getScoreReportSummary(@Query('userId') userId: string) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getScoreReportSummary(
+      parseInt(userId),
+    );
+  }
+
+  @Get('report/history')
+  async getScoreReportHistory(@Query('userId') userId: string) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getScoreReportHistory(
+      parseInt(userId),
+    );
+  }
+
+  @Get('wrong-answers')
+  async getWrongAnswers(@Query('userId') userId: string) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getWrongAnswers(parseInt(userId));
+  }
+
+  @Get('wrong-answers/:problemId')
+  async getWrongAnswerDetail(
+    @Param('problemId', ParseIntPipe) problemId: number,
+    @Query('userId') userId: string,
+  ) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getWrongAnswerDetail(
+      parseInt(userId),
+      problemId,
+    );
+  }
 }

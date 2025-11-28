@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from './drizzle/schema';
 import * as mathSchema from './drizzle/schema-math';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, sql } from 'drizzle-orm';
 import { DRIZZLE_ORM } from './drizzle/drizzle.module';
 import {
   SubmitTestDto,
@@ -203,5 +203,216 @@ export class SharedMathTestResultsService {
       ...new Set(results.map((r) => r.testSetId)),
     ] as number[];
     return testSetIds;
+  }
+
+  async getScoreReportSummary(userId: number): Promise<{
+    totalTests: number;
+    averageScore: number;
+    highestScore: number;
+    recentScore: number | null;
+    correctRate: number;
+  }> {
+    const results = await this.db
+      .select()
+      .from(schema.sharedMathTestResults)
+      .where(eq(schema.sharedMathTestResults.userId, userId))
+      .orderBy(desc(schema.sharedMathTestResults.completedAt));
+
+    if (results.length === 0) {
+      return {
+        totalTests: 0,
+        averageScore: 0,
+        highestScore: 0,
+        recentScore: null,
+        correctRate: 0,
+      };
+    }
+
+    const totalTests = results.length;
+    const totalEarned = results.reduce((sum, r) => sum + r.earnedScore, 0);
+    const totalPossible = results.reduce((sum, r) => sum + r.totalScore, 0);
+    const averageScore = Math.round((totalEarned / totalTests) * 10) / 10;
+    const highestScore = Math.max(...results.map((r) => r.earnedScore));
+    const recentScore = results[0].earnedScore;
+    const correctRate =
+      totalPossible > 0
+        ? Math.round((totalEarned / totalPossible) * 1000) / 10
+        : 0;
+
+    return {
+      totalTests,
+      averageScore,
+      highestScore,
+      recentScore,
+      correctRate,
+    };
+  }
+
+  async getScoreReportHistory(userId: number): Promise<
+    Array<{
+      id: number;
+      testSetId: number;
+      testTitle: string;
+      earnedScore: number;
+      totalScore: number;
+      correctRate: number;
+      completedAt: Date;
+    }>
+  > {
+    const results = await this.db
+      .select()
+      .from(schema.sharedMathTestResults)
+      .where(eq(schema.sharedMathTestResults.userId, userId))
+      .orderBy(desc(schema.sharedMathTestResults.completedAt));
+
+    const historyItems: Array<{
+      id: number;
+      testSetId: number;
+      testTitle: string;
+      earnedScore: number;
+      totalScore: number;
+      correctRate: number;
+      completedAt: Date;
+    }> = [];
+
+    for (const result of results) {
+      const [testSet] = await this.db
+        .select({ title: mathSchema.mathTestSets.title })
+        .from(mathSchema.mathTestSets)
+        .where(eq(mathSchema.mathTestSets.id, result.testSetId))
+        .limit(1);
+
+      historyItems.push({
+        id: result.id,
+        testSetId: result.testSetId,
+        testTitle: testSet?.title || `시험 #${result.testSetId}`,
+        earnedScore: result.earnedScore,
+        totalScore: result.totalScore,
+        correctRate:
+          result.totalScore > 0
+            ? Math.round((result.earnedScore / result.totalScore) * 1000) / 10
+            : 0,
+        completedAt: result.completedAt,
+      });
+    }
+
+    return historyItems;
+  }
+
+  async getWrongAnswers(userId: number): Promise<
+    Array<{
+      problemId: number;
+      questionText: string;
+      options: unknown;
+      correctAnswer: string;
+      selectedAnswer: string;
+      wrongCount: number;
+      lastAttemptedAt: Date;
+    }>
+  > {
+    const results = await this.db
+      .select()
+      .from(schema.sharedMathTestResults)
+      .where(eq(schema.sharedMathTestResults.userId, userId))
+      .orderBy(desc(schema.sharedMathTestResults.completedAt));
+
+    const wrongAnswersMap = new Map<
+      number,
+      {
+        problemId: number;
+        questionText: string;
+        options: unknown;
+        correctAnswer: string;
+        selectedAnswer: string;
+        wrongCount: number;
+        lastAttemptedAt: Date;
+      }
+    >();
+
+    for (const result of results) {
+      const answers = result.answers as Array<{
+        problemId: number;
+        selectedAnswer: string;
+      }>;
+
+      for (const answer of answers) {
+        const [problem] = await this.db
+          .select()
+          .from(mathSchema.mathProblems)
+          .where(eq(mathSchema.mathProblems.id, answer.problemId))
+          .limit(1);
+
+        if (problem && answer.selectedAnswer !== problem.correctAnswer) {
+          if (wrongAnswersMap.has(answer.problemId)) {
+            const existing = wrongAnswersMap.get(answer.problemId)!;
+            wrongAnswersMap.set(answer.problemId, {
+              ...existing,
+              wrongCount: existing.wrongCount + 1,
+            });
+          } else {
+            wrongAnswersMap.set(answer.problemId, {
+              problemId: answer.problemId,
+              questionText: problem.questionText,
+              options: problem.options,
+              correctAnswer: problem.correctAnswer,
+              selectedAnswer: answer.selectedAnswer,
+              wrongCount: 1,
+              lastAttemptedAt: result.completedAt,
+            });
+          }
+        }
+      }
+    }
+
+    return Array.from(wrongAnswersMap.values());
+  }
+
+  async getWrongAnswerDetail(
+    userId: number,
+    problemId: number,
+  ): Promise<{
+    problemId: number;
+    questionText: string;
+    options: unknown;
+    correctAnswer: string;
+    selectedAnswer: string;
+    explanation: string | null;
+    formula: string | null;
+  } | null> {
+    const results = await this.db
+      .select()
+      .from(schema.sharedMathTestResults)
+      .where(eq(schema.sharedMathTestResults.userId, userId))
+      .orderBy(desc(schema.sharedMathTestResults.completedAt));
+
+    for (const result of results) {
+      const answers = result.answers as Array<{
+        problemId: number;
+        selectedAnswer: string;
+      }>;
+
+      const wrongAnswer = answers.find((a) => a.problemId === problemId);
+      if (wrongAnswer) {
+        const [problem] = await this.db
+          .select()
+          .from(mathSchema.mathProblems)
+          .where(eq(mathSchema.mathProblems.id, problemId))
+          .limit(1);
+
+        if (problem && wrongAnswer.selectedAnswer !== problem.correctAnswer) {
+          return {
+            problemId: problem.id,
+            questionText: problem.questionText,
+            options: problem.options,
+            correctAnswer: problem.correctAnswer,
+            selectedAnswer: wrongAnswer.selectedAnswer,
+            explanation: problem.explanation,
+            formula: problem.formula,
+          };
+        }
+      }
+    }
+
+    return null;
   }
 }
