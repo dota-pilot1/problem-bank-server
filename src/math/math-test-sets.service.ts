@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
 import * as schema from '../drizzle/schema-math';
+import * as mainSchema from '../drizzle/schema';
 import { DRIZZLE_ORM } from '../drizzle/drizzle.module';
 
 export interface CreateMathTestSetDto {
@@ -161,6 +162,12 @@ export class MathTestSetsService {
   }
 
   async unpublish(id: number) {
+    // 1. 해당 시험의 결과(성적/오답) 삭제
+    await this.db
+      .delete(mainSchema.sharedMathTestResults)
+      .where(eq(mainSchema.sharedMathTestResults.testSetId, id));
+
+    // 2. 배포 상태 취소
     const [testSet] = await this.db
       .update(schema.mathTestSets)
       .set({
