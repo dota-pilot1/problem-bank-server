@@ -93,4 +93,12 @@ export class SharedTestResultsController {
       resultId,
     );
   }
+
+  @Get('results/:resultId/detail')
+  async getTestResultDetail(
+    @Param('resultId', ParseIntPipe) resultId: number,
+    @Query('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.sharedTestResultsService.getTestResultDetail(userId, resultId);
+  }
 }

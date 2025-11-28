@@ -112,4 +112,18 @@ export class SharedMathTestResultsController {
       resultId,
     );
   }
+
+  @Get('results/:resultId/detail')
+  async getTestResultDetail(
+    @Param('resultId', ParseIntPipe) resultId: number,
+    @Query('userId') userId: string,
+  ) {
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+    return this.sharedMathTestResultsService.getTestResultDetail(
+      parseInt(userId),
+      resultId,
+    );
+  }
 }
