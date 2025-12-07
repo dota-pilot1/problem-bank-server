@@ -489,6 +489,37 @@ export class SharedTestResultsService {
     };
   }
 
+  async deleteResult(
+    resultId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    const deleted = await this.db
+      .delete(schema.sharedTestResults)
+      .where(eq(schema.sharedTestResults.id, resultId))
+      .returning();
+
+    return {
+      success: deleted.length > 0,
+      message:
+        deleted.length > 0
+          ? '성적이 삭제되었습니다.'
+          : '삭제할 성적을 찾을 수 없습니다.',
+    };
+  }
+
+  async deleteAllUserResults(
+    userId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    const deleted = await this.db
+      .delete(schema.sharedTestResults)
+      .where(eq(schema.sharedTestResults.userId, userId))
+      .returning();
+
+    return {
+      success: true,
+      message: `${deleted.length}개의 성적이 삭제되었습니다.`,
+    };
+  }
+
   async getTestResultDetail(
     userId: number,
     resultId: number,

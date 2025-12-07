@@ -101,4 +101,18 @@ export class SharedTestResultsController {
   ) {
     return this.sharedTestResultsService.getTestResultDetail(userId, resultId);
   }
+
+  @Delete(':resultId')
+  async deleteResult(
+    @Param('resultId', ParseIntPipe) resultId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.sharedTestResultsService.deleteResult(resultId);
+  }
+
+  @Delete('user/:userId/all')
+  async deleteAllUserResults(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.sharedTestResultsService.deleteAllUserResults(userId);
+  }
 }

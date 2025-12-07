@@ -126,4 +126,18 @@ export class SharedMathTestResultsController {
       resultId,
     );
   }
+
+  @Delete(':resultId')
+  async deleteResult(
+    @Param('resultId', ParseIntPipe) resultId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.sharedMathTestResultsService.deleteResult(resultId);
+  }
+
+  @Delete('user/:userId/all')
+  async deleteAllUserResults(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.sharedMathTestResultsService.deleteAllUserResults(userId);
+  }
 }
